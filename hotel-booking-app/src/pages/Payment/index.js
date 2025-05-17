@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Typography, Row, Col, Form, Input, Checkbox, Alert } from 'antd';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { getHotelByID } from '../../Service/HotelService';
 import './Payment.scss';
 import { bookRoom } from '../../Service/BookRoomService';
@@ -26,8 +26,16 @@ function Payment() {
     const currency = 'VND';
 
     const formattedDate = bookingData && Array.isArray(date) && date.length === 2
-        ? `${format(new Date(date[0]), 'dd/MM/yyyy')} - ${format(new Date(date[1]), 'dd/MM/yyyy')}`
-        : 'Không xác định';
+    ? (() => {
+        const start = new Date(date[0]);
+        const end = new Date(date[1]);
+        if (isValid(start) && isValid(end)) {
+            return `${format(start, 'dd/MM/yyyy')} - ${format(end, 'dd/MM/yyyy')}`;
+        } else {
+            return 'Không xác định';
+        }
+    })()
+    : 'Không xác định';
 
     const handlePayment = async (values) => {
 
