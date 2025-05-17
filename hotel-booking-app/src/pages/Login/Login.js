@@ -2,12 +2,14 @@ import { Button, Checkbox, Form, Input } from "antd";
 import { getUserByPhone, getUserByEmail } from "../../Service/UserServices";
 import { useNavigate } from "react-router-dom";
 import { message } from 'antd';
+import Cookies from "js-cookie";
 import { useState } from "react";
 
 function Login() {
     const navigate = useNavigate();
+    const [islogin, setIsLogin] = useState(false);
     const [loading, setLoading] = useState(false); // Trạng thái loading
-    
+
 
     function checkString(string) {
         const phonePattern = /^(?:\+84|0)[0-9]{9,10}$/;
@@ -55,24 +57,36 @@ function Login() {
             }
 
             // Gửi yêu cầu xác thực tới backend thay vì so sánh mật khẩu trực tiếp
-            const authResponse = await authenticateUser(username, password); // Giả định API xác thực
-            if (!authResponse.success) {
-                message.error('Sai mật khẩu!');
-                return;
+            // const authResponse = await authenticateUser(username, password); // Giả định API xác thực
+            // if (!authResponse.success) {
+            //     message.error('Sai mật khẩu!');
+            //     return;
+            // }
+
+            if (response[0].password == password) {
+                setIsLogin(true);
+                Cookies.set("id", response[0].id, { expires: 1, secure: true });
+                Cookies.set("fullName", response[0].fullName, { expires: 1, secure: true });
+                Cookies.set("email", response[0].email, { expires: 1, secure: true });
+                Cookies.set("phone", response[0].phone, { expires: 1, secure: true });
+                Cookies.set("admin", response[0].admin, { expires: 1, secure: true });
+                Cookies.set("token", response[0].token, { expires: 1, secure: true });
+
+                // Lưu thông tin nếu chọn "remember me"
+                if (remember && islogin) {
+                    localStorage.setItem('token', response[0].token);
+                }
+
+                // Điều hướng và message ở đây luôn, không cần check lại islogin
+                if (response[0].admin) {
+                    message.success('Đăng nhập thành công!');
+                    navigate('/admin', { state: { user: response } });
+                } else {
+                    message.success('Đăng nhập thành công!');
+                    navigate('/', { state: { user: response } });
+                }
             }
 
-            // Lưu thông tin nếu chọn "remember me"
-            if (remember) {
-                localStorage.setItem('token', authResponse.token); // Lưu token nếu có
-            }
-
-            // Điều hướng dựa trên vai trò người dùng
-            if (response.admin) {
-                message.success('Đăng nhập thành công!');
-                navigate('/admin', { state: { user: response } });
-            } else {
-                message.error('Bạn không có quyền truy cập trang admin!');
-            }
         } catch (error) {
             console.error('Lỗi khi đăng nhập:', error);
             message.error('Đã có lỗi xảy ra, vui lòng thử lại!');

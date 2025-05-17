@@ -1,3 +1,4 @@
+import { elements } from 'chart.js';
 import LayoutDefault from '../layoutDefault/layoutDefault';
 // import BookRoom from "../pages/BookRoom";
 import CreateRoom from '../pages/CreateRoom';
@@ -8,6 +9,7 @@ import Home from '../pages/Home';
 import ListRoom from '../pages/ListRoom';
 import LoginPage from '../pages/Login';
 import Payment from '../pages/Payment';
+import PrivateRouters from '../components/PrivateRouters';
 
 export const router = [
     {
@@ -16,7 +18,7 @@ export const router = [
     },
     {
         path: "payment",
-        element: <Payment/>
+        element: <Payment />
     },
     {
         path: "discover",
@@ -33,21 +35,30 @@ export const router = [
         element: <LoginPage />
     },
     {
-        path: "/admin",
-        element: <LayoutDefault />,
+        element: <PrivateRouters />,
         children: [
             {
-                index: true,
-                element: <Dashboard />
+                path: "/admin",
+                element: <LayoutDefault />,
+                children: [
+                    {
+                        index: true,
+                        element: <Dashboard />
+                    },
+                    {
+                        path: "create-room",
+                        element: <CreateRoom />
+                    },
+                    {
+                        path: "list-room",
+                        element: <ListRoom />
+                    }
+                ]
             },
-            {
-                path: "create-room",
-                element: <CreateRoom />
-            },
-            {
-                path: "list-room",
-                element: <ListRoom />
-            }
         ]
+    },
+    {
+        path: "/*",
+        elements: <><h1>Trang không tồn tại</h1></>,
     }
 ];

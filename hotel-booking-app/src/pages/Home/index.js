@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button, Layout } from "antd";
 import './Home.scss';
 import video_background from '../../videos/video_background3.mp4';
-import { RightOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import LanguageSelector from "../../components/LanguageSelector";
 import { BsArrowRight } from "react-icons/bs";
 import TopMenu from "../../components/TopMenu";
@@ -11,6 +11,7 @@ import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import GridHotel from "../../components/GridHotel";
 import { getHotels } from "../../Service/HotelService";
+import Cookie from "js-cookie"
 
 const { Content, Footer } = Layout;
 
@@ -18,6 +19,16 @@ export default function Home() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const [ data, setData ] = useState([]);
+
+  const token = Cookie.get("token");
+
+    const handleLogout = () => {
+        Cookie.remove("id");
+        Cookie.remove("email");
+        Cookie.remove("fullName");
+        Cookie.remove("token");
+        navigate("/")
+    }
 
   useEffect( () => {
     const fetchAPI = async () => {
@@ -44,7 +55,16 @@ export default function Home() {
             </video>
             <div className="content">
               <div className="login-language">
-                <Link to='/login'>Đăng nhập <RightOutlined /> / </Link>
+                {token? (
+                  <>
+                    <Link onClick={handleLogout}>Đăng xuất <LeftOutlined /> / </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to='/login'>Đăng nhập <RightOutlined /> / </Link>
+                  </>
+                )}
+                
                 <LanguageSelector />
               </div>
               <div className="logo">
