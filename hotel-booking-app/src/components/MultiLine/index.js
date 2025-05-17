@@ -13,7 +13,9 @@ import {
 
 ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend, CategoryScale);
 
-const MultiLine = ({ bookings }) => {
+function MultiLine({ data }) {
+  const bookings = data;
+
   // Chuyển đổi dữ liệu bookings thành số lượng đặt phòng theo tháng
   const calculateMonthlyBookings = (bookings) => {
     if (!bookings || bookings.length === 0) {
@@ -40,7 +42,7 @@ const MultiLine = ({ bookings }) => {
   const monthlyData = calculateMonthlyBookings(bookings);
   const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
-  const data = {
+  const dataMultiLine = {
     labels,
     datasets: [
       {
@@ -81,7 +83,7 @@ const MultiLine = ({ bookings }) => {
     },
   };
 
-  return <Line data={data} options={options} />;
+  return <Line data={dataMultiLine} options={options} />;
 };
 
 export default MultiLine;

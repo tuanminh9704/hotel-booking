@@ -1,9 +1,12 @@
-import { Col, Row } from 'antd';
+import { Button, Col, Row } from 'antd';
 import './grid.scss';
 import MultiLine from '../MultiLine';
 import DemoRadar from '../Radar';
 import { useState, useEffect } from 'react';
 import { getAdditionalStats, getBookings, getFeedback, getNotifications, getRooms, getStats } from '../../Service/DashboardService';
+import BookingTable from '../BookingTable';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const StatsCard = ({ title, value, icon }) => {
   return (
@@ -17,101 +20,81 @@ const StatsCard = ({ title, value, icon }) => {
   );
 };
 
-const BookingTable = ({ bookings }) => {
-  return (
-    <div className="booking-table col box-8">
-      <h3>Đặt phòng gần đây</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Khách hàng</th>
-            <th>Phòng</th>
-            <th>Check-In</th>
-            <th>Check-Out</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.slice(0, 3).map((booking) => (
-            <tr key={booking.id}>
-              <td>{booking.id}</td>
-              <td>{booking.fullName || booking.customer}</td>
-              <td>{booking.room || 'N/A'}</td>
-              <td>{booking.date ? booking.date[0] : 'N/A'}</td>
-              <td>{booking.date ? booking.date[1] : 'N/A'}</td>
-              <td>
-                <span
-                  className={`status ${
-                    booking.status === 'Confirmed'
-                      ? 'status-confirmed'
-                      : booking.status === 'Pending'
-                      ? 'status-pending'
-                      : 'status-cancelled'
-                  }`}
-                >
-                  {booking.status || 'N/A'}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+const AdditionalStats = ({ bookings }) => {
+  if (!bookings || bookings.length === 0) {
+    return (
+      <div className="additional-stats col box-11">
+        <h3>Thống kê bổ sung</h3>
+        <p>Tỷ lệ hủy phòng: 0 %</p>
+        <p>Tỷ lệ chiếm dụng: 0 %</p>
+        <p>Tỷ lệ thành công: 0 %</p>
+      </div>
+    );
+  }
 
-const AvailableRooms = ({ rooms }) => {
-  return (
-    <div className="available-rooms col box-7">
-      <h3>Phòng trống</h3>
-      <ul>
-        {rooms.map((room) => (
-          <li key={room.id}>
-            Phòng {room.id} - {room.type} 
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+  const total = bookings.length;
+  const cancelled = bookings.filter(b => b.status === 'Cancelled').length;
+  const confirmed = bookings.filter(b => b.status === 'Confirmed').length;
 
-const FeedbackSummary = ({ feedbackCount }) => {
-  return (
-    <div className="feedback-summary col box-9">
-      <h3>Phản hồi khách hàng</h3>
-      <p>{feedbackCount} phản hồi mới cần xử lý.</p>
-    </div>
-  );
-};
+  const cancelRate = ((cancelled / total) * 100).toFixed(1);
+  const occupancyRate = ((confirmed / total) * 100).toFixed(1);
+  const successRate = occupancyRate; // Hoặc bạn có thể tính theo logic khác nếu cần
 
-const Notifications = ({ notificationCount }) => {
-  return (
-    <div className="notifications col box-10">
-      <h3>Thông báo</h3>
-      <p>{notificationCount} thông báo mới.</p>
-    </div>
-  );
-};
-
-const AdditionalStats = ({ cancellationRate, occupancyRate }) => {
   return (
     <div className="additional-stats col box-11">
       <h3>Thống kê bổ sung</h3>
-      <p>Tỷ lệ hủy phòng: {cancellationRate}%</p>
-      <p>Tỷ lệ chiếm dụng: {occupancyRate}%</p>
+      <Row gutter={[20]}>
+        <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24} ><h3>Tỷ lệ hủy phòng: {cancelRate} %</h3></Col>
+        <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24} ><h3>Tỷ lệ chiếm dụng: {occupancyRate} %</h3></Col>
+        <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24} ><h3>Tỷ lệ thành công: {successRate} %</h3></Col>
+      </Row>
     </div>
   );
 };
 
-function LearnGrid() {
+const exportBookingsToExcel = (bookings) => {
+    console.log(bookings);
+    
+
+  if (!bookings || bookings.length === 0) {
+    alert('Không có dữ liệu để xuất');
+    return;
+  }
+
+  // Chuyển đổi dữ liệu sang định dạng Excel-friendly
+  const excelData = bookings.map((b) => ({
+    ID: b.id,
+    'Khách hàng': b.fullName || 'N/A',
+    Email: b.email || 'N/A',
+    'Số điện thoại': b.phone || 'N/A',
+    'Khách sạn': b.hotelId || 'N/A',
+    'Loại phòng': b.roomTypeId || 'N/A',
+    'Ngày đến': b.date?.[0] || 'N/A',
+    'Ngày đi': b.date?.[1] || 'N/A',
+    'Trạng thái': b.status || 'N/A',
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(excelData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Đặt phòng');
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: 'application/octet-stream',
+  });
+
+  saveAs(blob, `danh_sach_dat_phong_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
+
+function Grid() {
   const [data, setData] = useState({
     stats: { totalBookings: 0, revenue: 0, newCustomers: 0 },
     bookings: [],
-    rooms: [],
-    feedback: { newFeedbackCount: 0 },
-    notifications: { newNotificationCount: 0 },
-    additionalStats: { cancellationRate: 0, occupancyRate: 0 },
   });
   const [loading, setLoading] = useState(true);
 
@@ -119,16 +102,12 @@ function LearnGrid() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [stats, bookings, rooms, feedback, notifications, additionalStats] = await Promise.all([
+        const [stats, bookings ] = await Promise.all([
           getStats(),
           getBookings(),
-          getRooms(),
-          getFeedback(),
-          getNotifications(),
-          getAdditionalStats(),
         ]);
 
-        setData({ stats, bookings, rooms, feedback, notifications, additionalStats });
+        setData({ stats, bookings });
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error.message);
       } finally {
@@ -138,8 +117,6 @@ function LearnGrid() {
 
     fetchData();
   }, []);
-
-  console.log('Dữ liệu sau khi fetch:', data);
 
   if (loading) return <p>Đang tải dữ liệu...</p>;
 
@@ -151,7 +128,7 @@ function LearnGrid() {
             <StatsCard title="Tổng đặt phòng" value={data.stats.totalBookings} icon="📋" />
           </Col>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
-            <StatsCard title="Doanh thu" value={`$${data.stats.revenue}`} icon="💰" />
+            <StatsCard title="Doanh thu" value={`${data.stats.revenue.toLocaleString('vi-VN')} VND`} icon="💰" />
           </Col>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
             <StatsCard title="Khách hàng mới" value={data.stats.newCustomers} icon="👥" />
@@ -166,23 +143,19 @@ function LearnGrid() {
               <DemoRadar data={data.bookings} />
             </div>
           </Col>
-          <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24}>
-            <AvailableRooms rooms={data.rooms} />
-          </Col>
-          <Col xxl={16} xl={16} lg={16} md={24} sm={24} xs={24}>
+          <Col xxl={24} xl={24} lg={24} md={24} sm={24} xs={24}>
             <BookingTable bookings={data.bookings} />
           </Col>
-          <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24}>
-            <FeedbackSummary feedbackCount={data.feedback.newFeedbackCount} />
-          </Col>
-          <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24}>
-            <Notifications notificationCount={data.notifications.newNotificationCount} />
-          </Col>
-          <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24}>
+          <Col xxl={24} xl={24} lg={24} md={24} sm={24} xs={24}>
             <AdditionalStats
-              cancellationRate={data.additionalStats.cancellationRate}
-              occupancyRate={data.additionalStats.occupancyRate}
+              bookings={data.bookings}
             />
+          </Col>
+          <Col xxl={24} xl={24} lg={24} md={24} sm={24} xs={24}>
+            <Button type='primary' size='large' onClick={() => exportBookingsToExcel(data.bookings)}>
+              <h3>Xuất báo cáo đặt phòng</h3>
+            </Button>
+            <span>(File Excel)</span>
           </Col>
         </Row>
       </main>
@@ -190,4 +163,4 @@ function LearnGrid() {
   );
 }
 
-export default LearnGrid;
+export default Grid;

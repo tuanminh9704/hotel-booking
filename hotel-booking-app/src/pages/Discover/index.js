@@ -8,6 +8,7 @@ import ListHotel from "./ListHotel";
 import HotelSearch from "../../components/Search";
 import TopMenu from "../../components/TopMenu";
 import RatingFilter from "../../components/RatingFilter";
+import Cookie from "js-cookie"
 
 function Discover() {
   const [hotels, setHotels] = useState([]);
@@ -16,6 +17,14 @@ function Discover() {
   const location = useLocation();
   const param = useParams()
 
+  const token = Cookie.get("token");
+
+  const handleLogout = () => {
+    Cookie.remove("id");
+    Cookie.remove("email");
+    Cookie.remove("fullName");
+    Cookie.remove("token");
+  }
 
   useEffect(() => {
     const fetchAPI = async () => {
@@ -66,6 +75,12 @@ function Discover() {
     setSelectedRatings(ratings);
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const keyword = params.get("keyword") || "";
+    setKeywordFromURL(keyword);
+  }, [location.search]);
+
   return (
     <Layout className="layout-home">
       <header>
@@ -82,9 +97,20 @@ function Discover() {
             </div>
             <Row className="login/logout" gutter={20}>
               <Col span={24}>
-                <Button className="login">
-                  <Link to={"/login"}>Đăng nhập</Link>
-                </Button>
+                {token ? (
+                  <>
+                    <Button className="login" onClick={handleLogout}>
+                      <Link >Đăng xuất</Link>
+                    </Button>
+                  </>
+
+                ) : (
+                  <>
+                    <Button className="login">
+                      <Link to={"/login"}>Đăng nhập</Link>
+                    </Button>
+                  </>
+                )}
               </Col>
             </Row>
           </div>

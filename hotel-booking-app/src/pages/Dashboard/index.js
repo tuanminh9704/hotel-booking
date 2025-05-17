@@ -1,9 +1,9 @@
-import LearnGrid from '../../components/grid'
+import Grid from '../../components/grid';
 
 function Dashboard() {
     return (
         <>
-            <LearnGrid />
+            <Grid />
         </>
     )
 }

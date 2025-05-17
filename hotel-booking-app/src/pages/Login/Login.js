@@ -85,6 +85,8 @@ function Login() {
                     message.success('Đăng nhập thành công!');
                     navigate('/', { state: { user: response } });
                 }
+            }else {
+                message.error('Sai mật khẩu!!!')
             }
 
         } catch (error) {
