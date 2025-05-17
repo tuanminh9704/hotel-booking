@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { getListRoom } from "../../Service/RoomService";
 import './ListRoom.scss'
 import { AppstoreOutlined, BarsOutlined } from '@ant-design/icons'
 import { Tabs } from 'antd'
-import GridRoom from "./GridRoom";
 import TableRoom from "./TableRoom";
+import { getHotels } from "../../Service/HotelService";
+import GridHotel from "../../components/GridHotel";
 
 function ListRoom() {
   const [rooms, setRooms] = useState([]);
 
   const fetchAPI = async () => {
-    const response = await getListRoom();
+    const response = await getHotels();
     setRooms(response);
   }
   
@@ -26,7 +26,7 @@ function ListRoom() {
     {
       key: "grid",
       label: <><AppstoreOutlined /></>,
-      children: <GridRoom record={rooms} />,
+      children: <GridHotel data={rooms}/>,
     },
     {
       key: "table",
@@ -37,7 +37,7 @@ function ListRoom() {
   
   return (
     <>
-      <h2>List room</h2>
+      <h2>Quản lý khách sạn</h2>
       <Tabs items={items} />
     </>
   )

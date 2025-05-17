@@ -1,48 +1,93 @@
-import { Radar } from '@ant-design/plots';
+import React from 'react';
+import { Radar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
-const data = [
-  { item: 'Design', type: 'a', score: 70 },
-  { item: 'Design', type: 'b', score: 30 },
-  { item: 'Development', type: 'a', score: 60 },
-  { item: 'Development', type: 'b', score: 70 },
-  { item: 'Marketing', type: 'a', score: 50 },
-  { item: 'Marketing', type: 'b', score: 60 },
-  { item: 'Users', type: 'a', score: 40 },
-  { item: 'Users', type: 'b', score: 50 },
-  { item: 'Test', type: 'a', score: 60 },
-  { item: 'Test', type: 'b', score: 70 },
-  { item: 'Language', type: 'a', score: 70 },
-  { item: 'Language', type: 'b', score: 50 },
-  { item: 'Technology', type: 'a', score: 50 },
-  { item: 'Technology', type: 'b', score: 40 },
-  { item: 'Support', type: 'a', score: 30 },
-  { item: 'Support', type: 'b', score: 40 },
-  { item: 'Sales', type: 'a', score: 60 },
-  { item: 'Sales', type: 'b', score: 40 },
-  { item: 'UX', type: 'a', score: 50 },
-  { item: 'UX', type: 'b', score: 60 },
-];
+ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
-function DemoRadar () {
-  const config = {
-    data,
-    xField: 'item',
-    yField: 'score',
-    colorField: 'type',
-    shapeField: 'smooth',
-    area: {
-      style: {
-        fillOpacity: 0.5,
+const DemoRadar = ({ bookings, hotels }) => {
+  // Tính tỷ lệ đặt phòng theo tỉnh (Hà Nội, Đà Nẵng, TP Hồ Chí Minh)
+  const calculateBookingRatesByProvince = (bookings, hotels) => {
+    if (!bookings || !hotels || bookings.length === 0) {
+      return { labels: ['Hà Nội', 'Đà Nẵng', 'TP Hồ Chí Minh'], data: [0, 0, 0] };
+    }
+
+    // Đếm số booking theo tỉnh
+    const bookingCountByProvince = {
+      'Hà Nội': 0,
+      'Đà Nẵng': 0,
+      'TP Hồ Chí Minh': 0,
+    };
+
+    // Lọc và đếm booking theo tỉnh
+    bookings.forEach((booking) => {
+      const hotel = hotels.find((h) => h.id === booking.roomId);
+      if (!hotel) return;
+
+      const address = hotel.address || '';
+      if (address.includes('Hà Nội')) {
+        bookingCountByProvince['Hà Nội'] += 1;
+      } else if (address.includes('Đà Nẵng')) {
+        bookingCountByProvince['Đà Nẵng'] += 1;
+      } else if (address.includes('TP. Hồ Chí Minh') || address.includes('TP Hồ Chí Minh')) {
+        bookingCountByProvince['TP Hồ Chí Minh'] += 1;
+      }
+    });
+
+    const totalBookings = bookings.length;
+    const labels = ['Hà Nội', 'Đà Nẵng', 'TP Hồ Chí Minh'];
+    const data = labels.map((province) =>
+      totalBookings > 0 ? Math.round((bookingCountByProvince[province] / totalBookings) * 100) : 0
+    );
+
+    return { labels, data };
+  };
+
+  const { labels, data } = calculateBookingRatesByProvince(bookings, hotels);
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Tỷ lệ đặt phòng (%)',
+        data,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgb(75, 192, 192)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Tỷ lệ đặt phòng theo tỉnh',
       },
     },
-    scale: { x: { padding: 0.5, align: 0 }, y: { tickCount: 5, domainMax: 80 } },
-    axis: { x: { grid: true }, y: { zIndex: 1, title: false } },
-    style: {
-      lineWidth: 2,
+    scales: {
+      r: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 20,
+        },
+      },
     },
   };
-  return <Radar {...config} />;
-}
 
+  return <Radar data={chartData} options={options} />;
+};
 
 export default DemoRadar;

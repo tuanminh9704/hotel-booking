@@ -1,108 +1,126 @@
-import { Table, Tag, Badge } from "antd";
+import { Table, Tag, Typography } from "antd";
 import DeleteRoom from "./DeleteRoom";
 import EditRoom from "./EditRoom";
 
+const { Title } = Typography;
+
 function TableRoom(props) {
     const { record, reLoad } = props;
+
+    // Tổng hợp tất cả phòng từ các khách sạn, hỗ trợ nhiều roomTypes
+    const dataSource = Array.isArray(record)
+        ? record.reduce((rooms, hotel) => {
+              if (hotel?.roomTypes && Array.isArray(hotel.roomTypes)) {
+                  return [
+                      ...rooms,
+                      ...hotel.roomTypes.map((room) => ({
+                          ...room,
+                          hotelName: hotel.name || "Khách sạn không xác định",
+                          hotelId: hotel.id || "N/A",
+                      })),
+                  ];
+              }
+              return rooms;
+          }, [])
+        : record?.roomTypes
+        ? record.roomTypes.map((room) => ({
+              ...room,
+              hotelName: record.name || "Khách sạn không xác định",
+              hotelId: record.id || "N/A",
+          }))
+        : [];
+
     const columns = [
+        {
+            title: 'Khách sạn',
+            dataIndex: 'hotelName',
+            key: 'hotelName',
+            render: (text) => text || "Chưa xác định",
+        },
         {
             title: 'Tên phòng',
             dataIndex: 'name',
             key: 'name',
-        },
-        {
-            title: 'Số lượng phòng',
-            dataIndex: 'quantity',
-            key: 'quantity',
+            render: (text) => text || "Chưa xác định",
         },
         {
             title: 'Số lượng giường',
-            dataIndex: 'quantity_bed',
-            key: 'quantity_bed',
+            dataIndex: 'quantityBed',
+            key: 'quantityBed',
+            render: (value) => (value !== undefined && value !== null ? value : "Chưa xác định"),
         },
         {
             title: 'Số người tối đa',
-            dataIndex: 'people_quantity_max',
-            key: 'people_quantity_max',
+            dataIndex: 'quantityPeople',
+            key: 'quantityPeople',
+            render: (value) => (value !== undefined && value !== null ? value : "Chưa xác định"),
         },
         {
-            title: 'tiện ích',
-            dataIndex: 'extend',
-            render: (_, { extend }) => {
-                return (
-                    <>
-                        {extend.map((extend,index) => (                        
-                                <Tag color="blue" key={index}>{extend}</Tag>
-                        ))}
-                    </>
-                )
-            },
-            key: 'extend',
+            title: 'Diện tích phòng (m²)',
+            dataIndex: 'roomArea',
+            key: 'roomArea',
+            render: (value) => (value !== undefined && value !== null ? value : "Chưa xác định"),
         },
         {
-            title: 'Mô tả',
-            dataIndex: 'decription',
-            key: 'decription',
+            title: 'Giá (VND)',
+            dataIndex: 'price',
+            key: 'price',
+            render: (price) => (price !== undefined && price !== null ? price.toLocaleString('vi-VN') : "Chưa xác định"),
         },
         {
-            title: 'Trạng thái',
-            dataIndex: 'status',
-            render: (_, { status }) => {
-                return (
-                    <>
-                        {status ? (
-                            <>
-                                <Badge status="success" text="Còn phòng" />
-                            </>
-                        ) : (
-                            <>
-                                <Badge status="error" text="Hết phòng" />
-                            </>
-                        )}
-                    </>
-                )
-            },
-            key: 'status',
-        },
-        {
-            title: 'Loại phòng',
-            dataIndex: 'type',
-            render: (_, { type }) => {
-                return (
-                    <>
-                        {type ? (
-                            <>
-                                <Tag bordered={false} color="purple">VIP</Tag>
-                            </>
-                        ) : (
-                            <>
-                                <Tag bordered={false} color="blue">Thường</Tag>
-                            </>
-                        )}
-                    </>
-                )
-            },
-            key: 'type',
+            title: 'Tiện ích',
+            dataIndex: 'amenities',
+            key: 'amenities',
+            render: (_, { amenities }) => (
+                <>
+                    {Array.isArray(amenities) && amenities.length > 0 ? (
+                        amenities.map((amenity) => (
+                            <Tag color="blue" key={amenity.id || Math.random()}>
+                                {amenity.name || "Tiện ích không xác định"}
+                            </Tag>
+                        ))
+                    ) : (
+                        <span>Không có tiện ích</span>
+                    )}
+                </>
+            ),
         },
         {
             title: 'Hành động',
             dataIndex: 'id',
-            render : (_, record) => (
+            key: 'action',
+            render: (_, record) => (
                 <>
-                    <DeleteRoom idRoom={record.id} reLoad={reLoad}/>
-                    <EditRoom record= {record} reLoad = {reLoad}/>
+                    <DeleteRoom idRoom={record.id} hotelId={record.hotelId} reLoad={reLoad} />
+                    <EditRoom record={record} reLoad={reLoad} />
                 </>
             ),
-            key: 'action',
-        }
-    ]
+        },
+    ];
 
+    // Lọc bỏ các cột không có dữ liệu
+    const filteredColumns = columns.filter((column) => {
+        if (column.dataIndex === "id" || column.key === "action") return true; // Giữ cột hành động
+        return dataSource.some((item) => {
+            const value = column.dataIndex === "amenities" 
+                ? item[column.dataIndex]
+                : item[column.dataIndex];
+            return value !== undefined && value !== null && 
+                   (Array.isArray(value) ? value.length > 0 : true);
+        });
+    });
 
     return (
-        <>
-            <Table dataSource={record} columns={columns} rowKey={columns[0].key}/>
-        </>
-    )
+        <div>
+            <Title level={4}>Danh sách phòng của tất cả khách sạn</Title>
+            <Table
+                dataSource={dataSource}
+                columns={filteredColumns}
+                rowKey="id"
+                locale={{ emptyText: 'Không có dữ liệu phòng' }}
+            />
+        </div>
+    );
 }
 
 export default TableRoom;

@@ -1,37 +1,87 @@
-import { Line } from '@ant-design/plots';
-import { useEffect, useState } from 'react';
+import React from 'react';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  CategoryScale,
+} from 'chart.js';
 
-function MultiLine() {
-    const [dataLine, setDataLine] = useState([]);
+ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend, CategoryScale);
 
-    useEffect(() => {
-        const fetchAPI = async () => {
-            fetch(`https://gw.alipayobjects.com/os/bmw-prod/55424a73-7cb8-4f79-b60d-3ab627ac5698.json`)
-                .then(res => res.json())
-                .then(data => {
-                    setDataLine(data);
-                })
-        }
-
-        fetchAPI();
-    }, [])
-
-    const config = {
-        data: dataLine,
-        xField: (d) => new Date(d.year),
-        yField: 'value',
-        sizeField: 'value',
-        shapeField: 'trail',
-        legend: { size: false },
-        colorField: 'category',
+const MultiLine = ({ bookings }) => {
+  // Chuyển đổi dữ liệu bookings thành số lượng đặt phòng theo tháng
+  const calculateMonthlyBookings = (bookings) => {
+    if (!bookings || bookings.length === 0) {
+      return Array(12).fill(0); // Trả về mảng 0 nếu không có dữ liệu
     }
 
-    return (
-        <>
-            <Line {...config} />
-        </>
-    )
-}
+    const monthlyCount = Array(12).fill(0); // Mảng 12 tháng (0-based: 0 = Jan, 1 = Feb, ...)
+    const currentYear = new Date().getFullYear(); // 2025
 
+    bookings.forEach((booking) => {
+      const checkInDate = booking.date[0]; // "dd/mm/yyyy"
+      const [day, month, year] = checkInDate.split('/');
+      if (parseInt(year) === currentYear) {
+        const monthIndex = parseInt(month) - 1; // Chuyển sang 0-based (Jan = 0)
+        if (monthIndex >= 0 && monthIndex < 12) {
+          monthlyCount[monthIndex] += 1;
+        }
+      }
+    });
+
+    return monthlyCount;
+  };
+
+  const monthlyData = calculateMonthlyBookings(bookings);
+  const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Đặt phòng 2025',
+        data: monthlyData,
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Xu hướng đặt phòng 2025',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Số lượng đặt phòng',
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Tháng',
+        },
+      },
+    },
+  };
+
+  return <Line data={data} options={options} />;
+};
 
 export default MultiLine;

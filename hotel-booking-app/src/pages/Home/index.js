@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Layout } from "antd";
 import './Home.scss';
 import video_background from '../../videos/video_background3.mp4';
@@ -9,12 +9,24 @@ import { BsArrowRight } from "react-icons/bs";
 import TopMenu from "../../components/TopMenu";
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
+import GridHotel from "../../components/GridHotel";
+import { getHotels } from "../../Service/HotelService";
 
 const { Content, Footer } = Layout;
 
 export default function Home() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
+  const [ data, setData ] = useState([]);
+
+  useEffect( () => {
+    const fetchAPI = async () => {
+      const response = await getHotels();
+      setData(response);
+    }
+
+    fetchAPI();
+  }, [])
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -64,7 +76,10 @@ export default function Home() {
           </div>
         </header>
 
-        <Content className="layout-welcome__conten"></Content>
+        <Content className="layout-welcome__conten">
+          <h1 className="title">Gợi ý các chỗ nghỉ cho bạn</h1>
+          <GridHotel data={data}/>
+        </Content>
         <Footer className="layout-home__footer">
           2025 copyright @Nhom5
         </Footer>

@@ -68,7 +68,7 @@
 
     &__content {
         padding: calc(10px + 10vw);
-        padding-top: 20px;
+        padding-top: 0px;
         padding-bottom: 50px;
         background-color: #fff;
 
@@ -124,6 +124,12 @@
                         font-weight: 500;
                     }
 
+                    .description {
+                        white-space: nowrap;
+                            overflow: hidden;  
+                            text-overflow: ellipsis;
+                    }
+
                     .cancel {
                         color: green;
                         font-weight: 600;
@@ -135,10 +141,6 @@
                         margin-bottom: 10px;
                     }
 
-                    .star {
-                        color: #FFB700;
-                        font-size: 20px;
-                    }
                 }
 
                 .card-price {

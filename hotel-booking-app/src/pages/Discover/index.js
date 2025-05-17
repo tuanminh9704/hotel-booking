@@ -1,5 +1,5 @@
 import { Button, Col, Layout, Row } from "antd";
-import { Link, useLocation } from "react-router";
+import { Link, Outlet, useLocation, useParams } from "react-router";
 import "./Discover.scss";
 import { Content, Footer } from "antd/es/layout/layout";
 import { useEffect, useState, useCallback, useMemo } from "react";
@@ -14,6 +14,7 @@ function Discover() {
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [keywordFromURL, setKeywordFromURL] = useState("");
   const location = useLocation();
+  const param = useParams()
 
 
   useEffect(() => {
@@ -26,7 +27,7 @@ function Discover() {
       }
     };
     fetchAPI();
-  }, []);
+  }, [param]);
 
   // Lọc khách sạn theo từ khóa & số sao
   const filteredHotels = useMemo(() => {
@@ -91,21 +92,27 @@ function Discover() {
         <div className="menu">
           <TopMenu />
         </div>
-<div className="search">
+        <div className="search">
           <HotelSearch onSearch={handleSearch} defaultKeyword={keywordFromURL} />
         </div>
       </header>
 
       <Content className="layout-home__content">
-        <Row gutter={20}>
-          <Col span={5} className="filter">
-            <h2>Chọn lọc theo:</h2>
-            <RatingFilter onFilter={handleFilter} />
-          </Col>
-          <Col span={19}>
-            <ListHotel data={filteredHotels} />
-          </Col>
-        </Row>
+        {param.id ? (
+          <><Outlet /></>
+        ) : (
+          <>
+            <Row gutter={20}>
+              <Col span={5} className="filter">
+                <h2>Chọn lọc theo:</h2>
+                <RatingFilter onFilter={handleFilter} />
+              </Col>
+              <Col span={19}>
+                <ListHotel data={filteredHotels} />
+              </Col>
+            </Row>
+          </>
+        )}
       </Content>
 
       <Footer className="layout-home__footer">2025 copyright @Nhom5</Footer>
