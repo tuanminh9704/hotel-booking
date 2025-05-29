@@ -9,7 +9,7 @@ import java.util.UUID;
 public class Reviews {
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false)
@@ -28,6 +28,36 @@ public class Reviews {
     @JoinColumn(name = "hotel_id", nullable = true)
     private Hotel hotel;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public Hotel getHotel() {
+        return hotel;
+    }
+
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public Reviews(UUID id, int rating, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;

@@ -33,42 +33,40 @@ public class HotelService {
                 .collect(Collectors.toList());
 
         List<ReviewsDTO> reviews = hotel.getReviews().stream()
-                .map(review -> new ReviewsDTO(review.getId(),  review.getRating(), review.getContent()))
+                .map(review -> new ReviewsDTO(review.getId(), review.getRating(), review.getContent()))
                 .collect(Collectors.toList());
-        
+
         List<RoomTypeDTO> roomTypes = hotel.getRoomTypes().stream()
-        .map(roomType -> {
-            List<AmenityDTO> amenities = roomType.getAmenities().stream()
-                    .map(amenity -> new AmenityDTO(amenity.getId(), amenity.getName(), roomType.getId()))
-                    .collect(Collectors.toList());
-            
-                RoomTypeDTO roomTypeDTO = new RoomTypeDTO(
-                    roomType.getId(),
-                    roomType.getName(),
-                    roomType.getQuantityBed(),
-                    roomType.getQuantityPeople(),
-                    roomType.getRoomArea(),
-                    roomType.getPrice(),
-                    amenities
-                );
-        
-                return roomTypeDTO;
-        })
-        .collect(Collectors.toList()); 
+                .map(roomType -> {
+                    List<AmenityDTO> amenities = roomType.getAmenities().stream()
+                            .map(amenity -> new AmenityDTO(amenity.getId(), amenity.getName(), roomType.getId()))
+                            .collect(Collectors.toList());
+
+                    RoomTypeDTO roomTypeDTO = new RoomTypeDTO(
+                            roomType.getId(),
+                            roomType.getName(),
+                            roomType.getQuantityBed(),
+                            roomType.getQuantityPeople(),
+                            roomType.getRoomArea(),
+                            roomType.getPrice(),
+                            amenities);
+
+                    return roomTypeDTO;
+                })
+                .collect(Collectors.toList());
 
         return new HotelDTO(
-            hotel.getId(),
-            hotel.getName(),
-            hotel.getThumbnail(),
-            hotel.getAddress(),
-            hotel.getLinkMap(),
-            hotel.getDescription(),
-            hotel.getRate(),
-            hotel.getCheckInTime(),
-            hotel.getCheckOutTime(),
-            images,
-            roomTypes,
-            reviews
-        );
+                hotel.getId(),
+                hotel.getName(),
+                hotel.getThumbnail(),
+                hotel.getAddress(),
+                hotel.getLinkMap(),
+                hotel.getDescription(),
+                hotel.getRate(),
+                hotel.getCheckInTime(),
+                hotel.getCheckOutTime(),
+                images,
+                roomTypes,
+                reviews);
     }
 }

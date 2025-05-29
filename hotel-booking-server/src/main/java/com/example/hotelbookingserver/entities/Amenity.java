@@ -4,16 +4,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.UuidGenerator;
+
 @Entity
 @Table(name = "amenities")
 public class Amenity {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "CHAR(36)")
+    @UuidGenerator
+    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id", nullable = false)
     private RoomType roomType;
 

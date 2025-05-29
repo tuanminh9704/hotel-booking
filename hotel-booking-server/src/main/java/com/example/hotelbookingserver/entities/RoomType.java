@@ -3,7 +3,9 @@ package com.example.hotelbookingserver.entities;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,16 +15,12 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Table(name = "room_types")
 public class RoomType {
-    
+
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
     private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
-    private Hotel hotel;
 
     @Column(nullable = false)
     private String name;
@@ -48,6 +46,13 @@ public class RoomType {
     @OneToMany(mappedBy = "roomType", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @BatchSize(size = 10)
     private Set<Amenity> amenities = new HashSet<>();
+
+    @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Booking> bookings = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
 
     @PrePersist
     protected void onCreate() {
@@ -127,4 +132,25 @@ public class RoomType {
     public Set<Amenity> getAmenities() {
         return amenities;
     }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setAmenities(Set<Amenity> amenities) {
+        this.amenities = amenities;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
 }

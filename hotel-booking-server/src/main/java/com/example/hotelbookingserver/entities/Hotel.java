@@ -1,97 +1,101 @@
-    package com.example.hotelbookingserver.entities;
+package com.example.hotelbookingserver.entities;
 
-    import jakarta.persistence.*;
-    import org.hibernate.annotations.BatchSize;
-    import org.hibernate.annotations.UuidGenerator;
-    import java.util.HashSet;
-    import java.util.Set;
-    import java.util.UUID;
+import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.UuidGenerator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
-    @Entity
-    @Table(name = "hotels")
-    public class Hotel {
-        @Id
-        @GeneratedValue
-        @UuidGenerator
-        @Column(columnDefinition = "CHAR(36)")
-        private UUID id;
+@Entity
+@Table(name = "hotels")
+public class Hotel {
+    @Id
+    @GeneratedValue
+    @UuidGenerator
+    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    private UUID id;
 
-        @Column(nullable = false)
-        private String name;
+    @Column(nullable = false)
+    private String name;
 
-        private String thumbnail;
-        
-        @Column(nullable = false)
-        private String address;
+    private String thumbnail;
 
-        private String linkMap;
+    @Column(nullable = false)
+    private String address;
 
-        private String description;
+    private String linkMap;
 
-        @Column(nullable = false)
-        private float rate;
+    private String description;
 
-        private String checkInTime;
+    @Column(nullable = false)
+    private float rate;
 
-        private String checkOutTime;
+    private String checkInTime;
 
-        @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-        @BatchSize(size = 10)
-        private Set<Image> images = new HashSet<>();
+    private String checkOutTime;
 
-        @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-        @BatchSize(size = 10)
-        private Set<RoomType> roomTypes = new HashSet<>();
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
+    private Set<Image> images = new HashSet<>();
 
-        @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-        @BatchSize(size = 10)
-        private Set<Reviews> reviews = new HashSet<>();
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
+    private Set<RoomType> roomTypes = new HashSet<>();
 
-        public UUID getId() {
-            return id;
-        }
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
+    private Set<Reviews> reviews = new HashSet<>();
 
-        public String getName() {
-            return name;
-        }
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)
+    private Set<Booking> bookings = new HashSet<>();
 
-        public String getAddress() {
-            return address;
-        }
-
-        public String getThumbnail() {
-            return thumbnail;
-        }
-
-        public String getLinkMap() {
-            return linkMap;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public float getRate() {
-            return rate;
-        }
-
-        public String getCheckInTime() {
-            return checkInTime;
-        }
-
-        public String getCheckOutTime() {
-            return checkOutTime;
-        }
-
-        public Set<Image> getImages() {
-            return this.images;
-        }
-
-        public Set<RoomType> getRoomTypes() {
-            return this.roomTypes;
-        }
-
-        public Set<Reviews> getReviews() {
-            return this.reviews;
-        }
+    public UUID getId() {
+        return id;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public String getLinkMap() {
+        return linkMap;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public float getRate() {
+        return rate;
+    }
+
+    public String getCheckInTime() {
+        return checkInTime;
+    }
+
+    public String getCheckOutTime() {
+        return checkOutTime;
+    }
+
+    public Set<Image> getImages() {
+        return this.images;
+    }
+
+    public Set<RoomType> getRoomTypes() {
+        return this.roomTypes;
+    }
+
+    public Set<Reviews> getReviews() {
+        return this.reviews;
+    }
+}
