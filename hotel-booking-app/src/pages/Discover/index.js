@@ -1,4 +1,4 @@
-import { Button, Col, Layout, Row } from "antd";
+import { Button, Col, Layout, Row, Pagination } from "antd";
 import { Link, Outlet, useLocation, useParams } from "react-router";
 import "./Discover.scss";
 import { Content, Footer } from "antd/es/layout/layout";
@@ -14,6 +14,9 @@ function Discover() {
   const [hotels, setHotels] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [keywordFromURL, setKeywordFromURL] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10); // Số hotel hiển thị mỗi trang
+  
   const location = useLocation();
   const param = useParams()
 
@@ -58,9 +61,17 @@ function Discover() {
     return result;
   }, [hotels, keywordFromURL, selectedRatings]);
 
+  // Tính toán dữ liệu hiển thị cho trang hiện tại
+  const currentPageData = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredHotels.slice(startIndex, endIndex);
+  }, [filteredHotels, currentPage, pageSize]);
+
   // Xử lý tìm kiếm và cập nhật keywordFromURL
   const handleSearch = useCallback(({ keyword }) => {
     setKeywordFromURL(keyword); // Cập nhật keyword ngay lập tức
+    setCurrentPage(1); // Reset về trang đầu khi tìm kiếm mới
     const newParams = new URLSearchParams(location.search);
     if (keyword) {
       newParams.set("keyword", keyword);
@@ -73,6 +84,19 @@ function Discover() {
   // Cập nhật bộ lọc số sao
   const handleFilter = useCallback((ratings) => {
     setSelectedRatings(ratings);
+    setCurrentPage(1); // Reset về trang đầu khi thay đổi filter
+  }, []);
+
+  // Xử lý thay đổi trang
+  const handlePageChange = useCallback((page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+    
+    // Scroll to top khi chuyển trang
+    window.scrollTo({ 
+      top: 0, 
+      behavior: 'smooth' 
+    });
   }, []);
 
   useEffect(() => {
@@ -80,6 +104,13 @@ function Discover() {
     const keyword = params.get("keyword") || "";
     setKeywordFromURL(keyword);
   }, [location.search]);
+
+  // Reset trang khi filteredHotels thay đổi
+  useEffect(() => {
+    if (currentPage > Math.ceil(filteredHotels.length / pageSize)) {
+      setCurrentPage(1);
+    }
+  }, [filteredHotels.length, pageSize, currentPage]);
 
   return (
     <Layout className="layout-home">
@@ -100,10 +131,9 @@ function Discover() {
                 {token ? (
                   <>
                     <Button className="login" onClick={handleLogout}>
-                      <Link >Đăng xuất</Link>
+                      <Link>Đăng xuất</Link>
                     </Button>
                   </>
-
                 ) : (
                   <>
                     <Button className="login">
@@ -134,7 +164,70 @@ function Discover() {
                 <RatingFilter onFilter={handleFilter} />
               </Col>
               <Col span={19}>
-                <ListHotel data={filteredHotels} />
+                <div>
+                  {/* Hiển thị thông tin tổng quan */}
+                  <div style={{ 
+                    marginBottom: '16px', 
+                    fontSize: '14px', 
+                    color: '#666',
+                    textAlign: 'right'
+                  }}>
+                    Tìm thấy {filteredHotels.length} khách sạn
+                    {keywordFromURL && (
+                      <span> cho từ khóa "<strong>{keywordFromURL}</strong>"</span>
+                    )}
+                  </div>
+                  
+                  {/* Danh sách khách sạn */}
+                  <ListHotel data={currentPageData} />
+                  
+                  {/* Pagination */}
+                  {filteredHotels.length > 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'center', 
+                      marginTop: '32px',
+                      marginBottom: '20px'
+                    }}>
+                      <Pagination
+                        current={currentPage}
+                        total={filteredHotels.length}
+                        pageSize={pageSize}
+                        onChange={handlePageChange}
+                        showSizeChanger={true}
+                        showQuickJumper={true}
+                        showTotal={(total, range) => 
+                          `${range[0]}-${range[1]} của ${total} khách sạn`
+                        }
+                        pageSizeOptions={['5', '10', '15', '20']}
+                        locale={{
+                          items_per_page: '/ trang',
+                          jump_to: 'Đến trang',
+                          jump_to_confirm: 'xác nhận',
+                          page: '',
+                          prev_page: 'Trang trước',
+                          next_page: 'Trang sau',
+                          prev_5: '5 trang trước',
+                          next_5: '5 trang sau',
+                          prev_3: '3 trang trước',
+                          next_3: '3 trang sau'
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Thông báo không tìm thấy kết quả */}
+                  {filteredHotels.length === 0 && hotels.length > 0 && (
+                    <div style={{ 
+                      textAlign: 'center', 
+                      padding: '40px',
+                      color: '#999'
+                    }}>
+                      <h3>Không tìm thấy khách sạn phù hợp</h3>
+                      <p>Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
+                    </div>
+                  )}
+                </div>
               </Col>
             </Row>
           </>

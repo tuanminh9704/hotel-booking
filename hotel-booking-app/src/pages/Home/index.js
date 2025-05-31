@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Button, Layout } from "antd";
+import { Button, Layout, Pagination } from "antd";
 import './Home.scss';
 import video_background from '../../videos/video_background3.mp4';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
@@ -18,30 +18,48 @@ const { Content, Footer } = Layout;
 export default function Home() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
-  const [ data, setData ] = useState([]);
-
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(6); // Số hotel hiển thị mỗi trang
+  const [totalHotels, setTotalHotels] = useState(0);
+  
   const token = Cookie.get("token");
+  
+  const handleLogout = () => {
+    Cookie.remove("id");
+    Cookie.remove("email");
+    Cookie.remove("fullName");
+    Cookie.remove("token");
+    navigate("/")
+  }
 
-    const handleLogout = () => {
-        Cookie.remove("id");
-        Cookie.remove("email");
-        Cookie.remove("fullName");
-        Cookie.remove("token");
-        navigate("/")
-    }
-
-  useEffect( () => {
+  useEffect(() => {
     const fetchAPI = async () => {
       const response = await getHotels();
       setData(response);
+      setTotalHotels(response.length);
     }
-
     fetchAPI();
   }, [])
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
     navigate(`/discover?keyword=${encodeURIComponent(keyword.trim())}`);
+  };
+
+  // Tính toán dữ liệu hiển thị cho trang hiện tại
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return data.slice(startIndex, endIndex);
+  };
+
+  // Xử lý thay đổi trang
+  const handlePageChange = (page, size) => {
+    setCurrentPage(page);
+    setPageSize(size);
+    // Scroll to top khi chuyển trang
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -55,7 +73,7 @@ export default function Home() {
             </video>
             <div className="content">
               <div className="login-language">
-                {token? (
+                {token ? (
                   <>
                     <Link onClick={handleLogout}>Đăng xuất <LeftOutlined /> / </Link>
                   </>
@@ -76,9 +94,8 @@ export default function Home() {
               <Button className="button-discover"><Link to={'/discover'}><span>Khám phá</span><BsArrowRight /></Link></Button>
             </div>
           </div>
-
           {/* search mới */}
-          <div className="search" >
+          <div className="search">
             <div className="hotel-search-bar noborder">
               <div className="search-item">
                 <SearchOutlined className="icon" />
@@ -95,11 +112,47 @@ export default function Home() {
             </div>
           </div>
         </header>
-
+        
         <Content className="layout-welcome__conten">
           <h1 className="title">Gợi ý các chỗ nghỉ cho bạn</h1>
-          <GridHotel data={data}/>
+          <GridHotel data={getCurrentPageData()} />
+          
+          {/* Pagination Component */}
+          {totalHotels > 0 && (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              marginTop: '40px',
+              marginBottom: '20px'
+            }}>
+              <Pagination
+                current={currentPage}
+                total={totalHotels}
+                pageSize={pageSize}
+                onChange={handlePageChange}
+                showSizeChanger={true}
+                showQuickJumper={true}
+                showTotal={(total, range) => 
+                  `${range[0]}-${range[1]} của ${total} khách sạn`
+                }
+                pageSizeOptions={['6', '12', '18', '24']}
+                locale={{
+                  items_per_page: '/ trang',
+                  jump_to: 'Đến trang',
+                  jump_to_confirm: 'xác nhận',
+                  page: '',
+                  prev_page: 'Trang trước',
+                  next_page: 'Trang sau',
+                  prev_5: '5 trang trước',
+                  next_5: '5 trang sau',
+                  prev_3: '3 trang trước',
+                  next_3: '3 trang sau'
+                }}
+              />
+            </div>
+          )}
         </Content>
+        
         <Footer className="layout-home__footer">
           2025 copyright @Nhom5
         </Footer>
