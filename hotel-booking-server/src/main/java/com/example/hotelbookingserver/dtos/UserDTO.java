@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
-    private String id;
+    private UUID id;
     private String email;
     private String name;
     private String phoneNumber;

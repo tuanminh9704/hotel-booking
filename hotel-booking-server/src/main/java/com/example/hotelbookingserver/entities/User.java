@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +24,7 @@ public class User implements UserDetails {
     @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
-    private String id;
+    private UUID id;
 
     @NotBlank(message = "Email is required")
     @Column(unique = true)
