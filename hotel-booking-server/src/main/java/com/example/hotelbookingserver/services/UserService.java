@@ -72,6 +72,9 @@ public class UserService implements IUserService {
             response.setRole(user.getRole());
             response.setExpirationTime("7 Days");
             response.setMessage("successful");
+            response.setFullName(user.getName());
+            response.setEmail(user.getEmail());
+            response.setPhone(user.getPhone());
 
         } catch (OurException e) {
             response.setStatusCode(404);
@@ -85,121 +88,123 @@ public class UserService implements IUserService {
         return response;
     }
 
-    @Override
-    public Response getAllUsers() {
+    // @Override
+    // public Response getAllUsers() {
 
-        Response response = new Response();
-        try {
-            List<User> userList = userRepository.findAll();
-            List<UserDTO> userDTOList = Utils.mapUserListEntityToUserListDTO(userList);
-            response.setStatusCode(200);
-            response.setMessage("successful");
-            response.setUserList(userDTOList);
+    // Response response = new Response();
+    // try {
+    // List<User> userList = userRepository.findAll();
+    // List<UserDTO> userDTOList = Utils.mapUserListEntityToUserListDTO(userList);
+    // response.setStatusCode(200);
+    // response.setMessage("successful");
+    // response.setUserList(userDTOList);
 
-        } catch (Exception e) {
-            response.setStatusCode(500);
-            response.setMessage("Error getting all users " + e.getMessage());
-        }
-        return response;
-    }
+    // } catch (Exception e) {
+    // response.setStatusCode(500);
+    // response.setMessage("Error getting all users " + e.getMessage());
+    // }
+    // return response;
+    // }
 
-    @Override
-    public Response getUserBookingHistory(String userId) {
+    // @Override
+    // public Response getUserBookingHistory(String userId) {
 
-        Response response = new Response();
+    // Response response = new Response();
 
-        try {
-            UUID uuid = UUID.fromString(userId);
-            User user = userRepository.findById(uuid)
-                    .orElseThrow(() -> new OurException("User Not Found"));
-            UserDTO userDTO = Utils.mapUserEntityToUserDTOPlusUserBookingsAndRoom(user);
-            response.setStatusCode(200);
-            response.setMessage("successful");
-            response.setUser(userDTO);
+    // try {
+    // UUID uuid = UUID.fromString(userId);
+    // User user = userRepository.findById(uuid)
+    // .orElseThrow(() -> new OurException("User Not Found"));
+    // UserDTO userDTO = Utils.mapUserEntityToUserDTOPlusUserBookingsAndRoom(user);
+    // response.setStatusCode(200);
+    // response.setMessage("successful");
+    // response.setUser(userDTO);
 
-        } catch (OurException e) {
-            response.setStatusCode(404);
-            response.setMessage(e.getMessage());
+    // } catch (OurException e) {
+    // response.setStatusCode(404);
+    // response.setMessage(e.getMessage());
 
-        } catch (Exception e) {
+    // } catch (Exception e) {
 
-            response.setStatusCode(500);
-            response.setMessage("Error getting all users " + e.getMessage());
-        }
-        return response;
-    }
+    // response.setStatusCode(500);
+    // response.setMessage("Error getting all users " + e.getMessage());
+    // }
+    // return response;
+    // }
 
-    @Override
-    public Response deleteUser(String userId) {
+    // @Override
+    // public Response deleteUser(String userId) {
 
-        Response response = new Response();
+    // Response response = new Response();
 
-        try {
-            UUID uuid = UUID.fromString(userId);
-            userRepository.findById(uuid).orElseThrow(() -> new OurException("User Not Found"));
-            userRepository.deleteById(uuid);
-            response.setStatusCode(200);
-            response.setMessage("successful");
+    // try {
+    // UUID uuid = UUID.fromString(userId);
+    // userRepository.findById(uuid).orElseThrow(() -> new OurException("User Not
+    // Found"));
+    // userRepository.deleteById(uuid);
+    // response.setStatusCode(200);
+    // response.setMessage("successful");
 
-        } catch (OurException e) {
-            response.setStatusCode(404);
-            response.setMessage(e.getMessage());
+    // } catch (OurException e) {
+    // response.setStatusCode(404);
+    // response.setMessage(e.getMessage());
 
-        } catch (Exception e) {
+    // } catch (Exception e) {
 
-            response.setStatusCode(500);
-            response.setMessage("Error getting all users " + e.getMessage());
-        }
-        return response;
-    }
+    // response.setStatusCode(500);
+    // response.setMessage("Error getting all users " + e.getMessage());
+    // }
+    // return response;
+    // }
 
-    @Override
-    public Response getUserById(String userId) {
+    // @Override
+    // public Response getUserById(String userId) {
 
-        Response response = new Response();
+    // Response response = new Response();
 
-        try {
-            UUID uuid = UUID.fromString(userId);
-            User user = userRepository.findById(uuid)
-                    .orElseThrow(() -> new OurException("User Not Found"));
-            UserDTO userDTO = Utils.mapUserEntityToUserDTO(user);
-            response.setStatusCode(200);
-            response.setMessage("successful");
-            response.setUser(userDTO);
+    // try {
+    // UUID uuid = UUID.fromString(userId);
+    // User user = userRepository.findById(uuid)
+    // .orElseThrow(() -> new OurException("User Not Found"));
+    // UserDTO userDTO = Utils.mapUserEntityToUserDTO(user);
+    // response.setStatusCode(200);
+    // response.setMessage("successful");
+    // response.setUser(userDTO);
 
-        } catch (OurException e) {
-            response.setStatusCode(404);
-            response.setMessage(e.getMessage());
+    // } catch (OurException e) {
+    // response.setStatusCode(404);
+    // response.setMessage(e.getMessage());
 
-        } catch (Exception e) {
+    // } catch (Exception e) {
 
-            response.setStatusCode(500);
-            response.setMessage("Error getting all users " + e.getMessage());
-        }
-        return response;
-    }
+    // response.setStatusCode(500);
+    // response.setMessage("Error getting all users " + e.getMessage());
+    // }
+    // return response;
+    // }
 
-    @Override
-    public Response getMyInfo(String email) {
+    // @Override
+    // public Response getMyInfo(String email) {
 
-        Response response = new Response();
+    // Response response = new Response();
 
-        try {
-            User user = userRepository.findByEmail(email).orElseThrow(() -> new OurException("User Not Found"));
-            UserDTO userDTO = Utils.mapUserEntityToUserDTO(user);
-            response.setStatusCode(200);
-            response.setMessage("successful");
-            response.setUser(userDTO);
+    // try {
+    // User user = userRepository.findByEmail(email).orElseThrow(() -> new
+    // OurException("User Not Found"));
+    // UserDTO userDTO = Utils.mapUserEntityToUserDTO(user);
+    // response.setStatusCode(200);
+    // response.setMessage("successful");
+    // response.setUser(userDTO);
 
-        } catch (OurException e) {
-            response.setStatusCode(404);
-            response.setMessage(e.getMessage());
+    // } catch (OurException e) {
+    // response.setStatusCode(404);
+    // response.setMessage(e.getMessage());
 
-        } catch (Exception e) {
+    // } catch (Exception e) {
 
-            response.setStatusCode(500);
-            response.setMessage("Error getting all users " + e.getMessage());
-        }
-        return response;
-    }
+    // response.setStatusCode(500);
+    // response.setMessage("Error getting all users " + e.getMessage());
+    // }
+    // return response;
+    // }
 }

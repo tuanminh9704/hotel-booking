@@ -9,14 +9,14 @@ public interface IUserService {
 
     Response login(LoginRequest loginRequest);
 
-    Response getAllUsers();
+    // Response getAllUsers();
 
-    Response getUserBookingHistory(String userId);
+    // Response getUserBookingHistory(String userId);
 
-    Response deleteUser(String userId);
+    // Response deleteUser(String userId);
 
-    Response getUserById(String userId);
+    // Response getUserById(String userId);
 
-    Response getMyInfo(String email);
+    // Response getMyInfo(String email);
 
 }

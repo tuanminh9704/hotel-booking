@@ -19,22 +19,9 @@ public class RoomTypeDTO {
     private int quantityPeople;
     private int roomArea;
     private BigDecimal price;
-    List<AmenityDTO> amenities;
-    private List<BookingDTO> bookings;
+    private List<AmenityDTO> amenities;
 
-    public RoomTypeDTO(UUID id, String name, int quantityBed, int quantityPeople, int roomArea, BigDecimal price,
-            List<AmenityDTO> amenities, List<BookingDTO> bookings) {
-        this.id = id;
-        this.name = name;
-        this.quantityBed = quantityBed;
-        this.quantityPeople = quantityPeople;
-        this.roomArea = roomArea;
-        this.price = price;
-        this.amenities = amenities;
-        this.bookings = bookings;
-    }
-
-    // Constructor chỉ có Amenity
+    // private List<BookingDTO> bookings;
     public RoomTypeDTO(UUID id, String name, int quantityBed, int quantityPeople, int roomArea, BigDecimal price,
             List<AmenityDTO> amenities) {
         this.id = id;

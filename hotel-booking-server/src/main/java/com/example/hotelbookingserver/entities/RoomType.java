@@ -10,7 +10,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "room_types")
@@ -20,6 +22,7 @@ public class RoomType {
     @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
     @Column(nullable = false)
@@ -37,11 +40,8 @@ public class RoomType {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "quantity_room")
+    private int quantityRoom;
 
     @OneToMany(mappedBy = "roomType", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @BatchSize(size = 10)
@@ -53,17 +53,6 @@ public class RoomType {
     @ManyToOne
     @JoinColumn(name = "hotel_id", nullable = false)
     private Hotel hotel;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     public UUID getId() {
         return id;
@@ -121,24 +110,8 @@ public class RoomType {
         this.price = price;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
     public Set<Amenity> getAmenities() {
         return amenities;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public void setAmenities(Set<Amenity> amenities) {
@@ -151,6 +124,21 @@ public class RoomType {
 
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    @Override
+    public String toString() {
+        return "RoomType [id=" + id + ", name=" + name + ", quantityBed=" + quantityBed + ", quantityPeople="
+                + quantityPeople + ", roomArea=" + roomArea + ", price=" + price + ", quantityRoom=" + quantityRoom
+                + ", amenities=" + amenities + ", bookings=" + bookings + ", hotel=" + hotel + "]";
+    }
+
+    public int getQuantityRoom() {
+        return quantityRoom;
+    }
+
+    public void setQuantityRoom(int quantityRoom) {
+        this.quantityRoom = quantityRoom;
     }
 
 }
