@@ -45,13 +45,13 @@ public class RoomType {
 
     @OneToMany(mappedBy = "roomType", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @BatchSize(size = 10)
-    private Set<Amenity> amenities = new HashSet<>();
+    private List<Amenity> amenities = new ArrayList<>();
 
     @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
+    @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
     public UUID getId() {
@@ -110,14 +110,6 @@ public class RoomType {
         this.price = price;
     }
 
-    public Set<Amenity> getAmenities() {
-        return amenities;
-    }
-
-    public void setAmenities(Set<Amenity> amenities) {
-        this.amenities = amenities;
-    }
-
     public List<Booking> getBookings() {
         return bookings;
     }
@@ -139,6 +131,14 @@ public class RoomType {
 
     public void setQuantityRoom(int quantityRoom) {
         this.quantityRoom = quantityRoom;
+    }
+
+    public List<Amenity> getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(List<Amenity> amenities) {
+        this.amenities = amenities;
     }
 
 }

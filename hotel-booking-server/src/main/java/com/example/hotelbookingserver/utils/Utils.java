@@ -5,11 +5,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.example.hotelbookingserver.dtos.BookingDTO;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 import com.example.hotelbookingserver.dtos.UserDTO;
+import com.example.hotelbookingserver.entities.Amenity;
 import com.example.hotelbookingserver.entities.Booking;
 import com.example.hotelbookingserver.entities.RoomType;
 import com.example.hotelbookingserver.entities.User;
@@ -72,6 +74,8 @@ public class Utils {
         roomTypeDTO.setQuantityPeople(roomType.getQuantityPeople());
         roomTypeDTO.setRoomArea(roomType.getRoomArea());
         roomTypeDTO.setPrice(roomType.getPrice());
+        roomTypeDTO.setQuantityRoom(roomType.getQuantityRoom());
+
         return roomTypeDTO;
     }
 

@@ -3,6 +3,7 @@ package com.example.hotelbookingserver.services;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -11,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.hotelbookingserver.dtos.Response;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
+import com.example.hotelbookingserver.entities.Hotel;
 import com.example.hotelbookingserver.entities.RoomType;
 import com.example.hotelbookingserver.repositories.BookingRepository;
+import com.example.hotelbookingserver.repositories.HotelRepository;
 import com.example.hotelbookingserver.repositories.RoomTypeRepository;
 import com.example.hotelbookingserver.utils.Utils;
 
@@ -20,23 +23,21 @@ import com.example.hotelbookingserver.utils.Utils;
 public class RoomTypeService implements IRoomTypeService {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
-    @Autowired
-    private BookingRepository bookingRepository;
 
     @Override
-    public Response addNewRoom(String name, int quantity_bed, int quantity_people, int roomArea, BigDecimal price,
+    public Response addNewRoom(String name, int quantityBed, int quantityPeople, int roomArea, BigDecimal price,
             int quantityRoom) {
         Response response = new Response();
 
         try {
-
             RoomType roomType = new RoomType();
             roomType.setName(name);
-            roomType.setQuantityBed(quantity_bed);
-            roomType.setQuantityPeople(quantity_people);
+            roomType.setQuantityBed(quantityBed);
+            roomType.setQuantityPeople(quantityPeople);
             roomType.setRoomArea(roomArea);
             roomType.setPrice(price);
             roomType.setQuantityRoom(quantityRoom);
+
             RoomType savedRoom = roomTypeRepository.save(roomType);
             RoomTypeDTO roomTypeDTO = Utils.mapRoomEntityToRoomDTO(savedRoom);
             response.setStatusCode(200);

@@ -51,6 +51,7 @@ public class HotelService {
                                                         roomType.getQuantityBed(),
                                                         roomType.getQuantityPeople(),
                                                         roomType.getRoomArea(),
+                                                        roomType.getQuantityRoom(),
                                                         roomType.getPrice(),
                                                         amenities);
 

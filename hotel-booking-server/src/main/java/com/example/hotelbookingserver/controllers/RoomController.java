@@ -8,13 +8,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.hotelbookingserver.dtos.Response;
-import com.example.hotelbookingserver.services.IBookingService;
+import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 import com.example.hotelbookingserver.services.IRoomTypeService;
 
 @RestController
@@ -25,22 +24,23 @@ public class RoomController {
     private IRoomTypeService roomService;
 
     @PostMapping("/add")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> addNewRoom(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "quantityBed", required = false) int quantityBed,
-            @RequestParam(value = "quantityPeople", required = false) int quantityPeople,
-            @RequestParam(value = "roomArea", required = false) int roomArea,
-            @RequestParam(value = "price", required = false) BigDecimal price,
-            @RequestParam(value = "quantityRoom", required = false) int quantityRoom) {
+    // @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Response> addNewRoom(@RequestBody RoomTypeDTO request) {
 
-        if (name == null || name.isEmpty() || price == null) {
+        if (request.getName() == null || request.getName().isEmpty() || request.getPrice() == null) {
             Response response = new Response();
             response.setStatusCode(400);
-            response.setMessage("Please provide values for all fields(photo, roomType,roomPrice)");
+            response.setMessage("Please provide values for all fields (name, price)");
             return ResponseEntity.status(response.getStatusCode()).body(response);
         }
-        Response response = roomService.addNewRoom(name, quantityBed, quantityPeople, roomArea, price, quantityRoom);
+
+        Response response = roomService.addNewRoom(
+                request.getName(),
+                request.getQuantityBed(),
+                request.getQuantityPeople(),
+                request.getRoomArea(),
+                request.getPrice(),
+                request.getQuantityRoom());
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
