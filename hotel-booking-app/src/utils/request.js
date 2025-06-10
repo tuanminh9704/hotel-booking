@@ -1,51 +1,62 @@
-const API_DOMAIN = "http://localhost:3001/"
+const baseURL = "http://localhost:8081/"
 
-export const get = async (path) => {
-    const response = await fetch(API_DOMAIN + path);
-    const result = await response.json();
-    return result;
+const token = localStorage.getItem("accessToken");
+
+async function checkResponse(response) {
+  if (!response.ok) {
+    // Đọc body json hoặc text 1 lần
+    const contentType = response.headers.get("content-type");
+    let errorMessage = `HTTP error! status: ${response.status}`;
+    if (contentType && contentType.includes("application/json")) {
+      const errorData = await response.json();
+      errorMessage = errorData.message || JSON.stringify(errorData);
+    } else {
+      const text = await response.text();
+      if (text) errorMessage = text;
+    }
+    throw new Error(errorMessage);
+  }
+
+  // Nếu ok thì cũng đọc json 1 lần
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return await response.json();
+  }
+
+  return null;
 }
 
-export const post = async (path, options) => {
-    const response = await fetch(API_DOMAIN + path, {
-        method: "POST",
-        headers: {
-            'content-type': 'application/json'
-        },
-        body: JSON.stringify(options)
-    })
-    const result = await response.json();
-    return result;
+
+export async function post(url, data) {
+  const response = await fetch(baseURL + url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return checkResponse(response);
 }
 
-export const put = async (path, options) => {
-    const response = await fetch(API_DOMAIN + path, {
-        method: 'PUT',
-        headers: {
-            'content-type': 'appliction/json'
-        },
-        body: JSON.stringify(options)
-    })
-    const result = await response.json();
-    return result;
+export async function get(url) {
+  const response = await fetch(baseURL + url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // Gửi token trong header
+    },
+  });
+  return checkResponse(response);
 }
 
-export const patch = async (path, options) => {
-    const response = await fetch(API_DOMAIN + path, {
-        method: 'PATCH',
-        headers: {
-            'content-type': 'appliction/json'
-        },
-        body: JSON.stringify(options)
-    })
-    const result = await response.json();
-    return result;
+export async function del(url) {
+  const response = await fetch(baseURL + url, { method: 'DELETE' });
+  return checkResponse(response);
 }
 
-export const del = async (path) => {
-    const response = await fetch(API_DOMAIN + path, {
-        method: 'DELETE',
-    });
-    const result = await response.json();
-    return result;
+export async function patch(url, data) {
+  const response = await fetch(baseURL + url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return checkResponse(response);
 }

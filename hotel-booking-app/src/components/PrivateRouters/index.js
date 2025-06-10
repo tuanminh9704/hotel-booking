@@ -1,9 +1,8 @@
 import { Navigate, Outlet } from "react-router";
-import Cookie from "js-cookie"
 
 function PrivateRouters() {
     let isLogin = false;
-    if(Cookie.get("token")){
+    if(localStorage.getItem("accessToken")){
         isLogin = true;
     } else {
         isLogin = false;
@@ -11,7 +10,7 @@ function PrivateRouters() {
 
     return(
         <>
-            {isLogin ? (<Outlet />) : (<Navigate to="/login" />)}
+            {isLogin ? (<Outlet />) : (<Navigate to="/auth" />)}
         </>
     )
 }

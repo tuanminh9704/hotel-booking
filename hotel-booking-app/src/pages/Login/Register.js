@@ -1,8 +1,43 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
+import { createUser } from "../../Service/UserServices";
 
 function Register() {
-    const onFinish = values => {
-        console.log('Success:', values);
+    const [form] = Form.useForm();
+    const onFinish = async values => {
+
+        try {
+            // Kiểm tra mật khẩu khớp nhau
+            if (values.password !== values.verifyPassword) {
+                message.error("Mật khẩu và xác nhận mật khẩu không khớp");
+                return;
+            }
+
+            // Gọi API tạo người dùng
+            const response = await createUser({
+                email: values.email,
+                phone: values.phone,
+                name: values.name,
+                password: values.password
+            });
+
+            if (response && (response.statusCode === 200 || response.status === 200)) {
+                message.success("Đăng ký thành công");
+                form.resetFields(); // Reset form khi thành công
+                form.setFieldsValue({
+                    email: '',
+                    phone: '',
+                    name: '',
+                    password: '',
+                    verifyPassword: ''
+                });
+            } else {
+                message.error(response?.data?.message || "Đăng ký thất bại, vui lòng thử lại");
+            }
+        } catch (error) {
+            console.error("Lỗi khi đăng ký:", error);
+            const errorMessage = error.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại";
+            message.error(errorMessage);
+        }
     };
     const onFinishFailed = errorInfo => {
         console.log('Failed:', errorInfo);
@@ -11,24 +46,34 @@ function Register() {
     return (
         <div>
             <Form className="form"
-                name="login"
+                form={form}
+                name="register"
                 layout="vertical"
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
+
             >
                 <Form.Item
-                    label="Email hoặc số điện thoại"
-                    name="username"
+                    label="Email "
+                    name="email"
                     rules={[{ required: true, message: 'Mục này không được bỏ trống!' }]}
                 >
-                    <Input placeholder="Email hoặc số điện thoại" />
+                    <Input placeholder="Email " />
                 </Form.Item>
-                <p>(Ví dụ: yourname@email.com / +84904123456)</p>
+
+                <Form.Item
+                    label="Số điện thoại "
+                    name="phone"
+                    rules={[{ required: true, message: 'Mục này không được bỏ trống!' }]}
+                >
+                    <Input placeholder="Số điện thoại " />
+                </Form.Item>
+
                 <Form.Item
                     label="Họ và tên"
-                    name="fullName"
+                    name="name"
                     rules={[{ required: true, message: 'Mục này không được bỏ trống!' }]}
                 >
                     <Input placeholder="Họ và tên" />

@@ -11,7 +11,7 @@ import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import GridHotel from "../../components/GridHotel";
 import { getHotels } from "../../Service/HotelService";
-import Cookie from "js-cookie"
+
 
 const { Content, Footer } = Layout;
 
@@ -23,13 +23,10 @@ export default function Home() {
   const [pageSize, setPageSize] = useState(6); // Số hotel hiển thị mỗi trang
   const [totalHotels, setTotalHotels] = useState(0);
   
-  const token = Cookie.get("token");
+  const token = localStorage.getItem("accessToken");
   
   const handleLogout = () => {
-    Cookie.remove("id");
-    Cookie.remove("email");
-    Cookie.remove("fullName");
-    Cookie.remove("token");
+    localStorage.removeItem("accessToken");
     navigate("/")
   }
 
@@ -79,7 +76,7 @@ export default function Home() {
                   </>
                 ) : (
                   <>
-                    <Link to='/login'>Đăng nhập <RightOutlined /> / </Link>
+                    <Link to='/auth'>Đăng nhập <RightOutlined /> / </Link>
                   </>
                 )}
                 

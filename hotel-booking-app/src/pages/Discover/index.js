@@ -8,7 +8,7 @@ import ListHotel from "./ListHotel";
 import HotelSearch from "../../components/Search";
 import TopMenu from "../../components/TopMenu";
 import RatingFilter from "../../components/RatingFilter";
-import Cookie from "js-cookie"
+
 
 function Discover() {
   const [hotels, setHotels] = useState([]);
@@ -20,13 +20,10 @@ function Discover() {
   const location = useLocation();
   const param = useParams()
 
-  const token = Cookie.get("token");
+  const token = localStorage.getItem("accessToken");
 
   const handleLogout = () => {
-    Cookie.remove("id");
-    Cookie.remove("email");
-    Cookie.remove("fullName");
-    Cookie.remove("token");
+    localStorage.removeItem("accessToken");
   }
 
   useEffect(() => {
@@ -137,7 +134,7 @@ function Discover() {
                 ) : (
                   <>
                     <Button className="login">
-                      <Link to={"/login"}>Đăng nhập</Link>
+                      <Link to={"/auth"}>Đăng nhập</Link>
                     </Button>
                   </>
                 )}

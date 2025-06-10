@@ -31,7 +31,7 @@ export const router = [
         ]
     },
     {
-        path: "login",
+        path: "auth",
         element: <LoginPage />
     },
     {
@@ -51,7 +51,19 @@ export const router = [
                     },
                     {
                         path: "list-room",
-                        element: <ListRoom />
+                        element: <ListRoom />,
+                        children: [
+                            {
+                                path: "discover",
+                                element: <Discover />,
+                                children: [
+                                    {
+                                        path: "detail/:id",
+                                        element: <Detail />
+                                    },
+                                ]
+                            },
+                        ]
                     }
                 ]
             },
