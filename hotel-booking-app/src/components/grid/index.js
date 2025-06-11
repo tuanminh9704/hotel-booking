@@ -92,22 +92,16 @@ const exportBookingsToExcel = (bookings) => {
 
 
 function Grid() {
-  const [data, setData] = useState({
-    stats: { totalBookings: 0, revenue: 0, newCustomers: 0 },
-    bookings: [],
-  });
+  const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [stats, bookings ] = await Promise.all([
-          getStats(),
-          getBookings(),
-        ]);
+        const  bookings  = await getBookings()
 
-        setData({ stats, bookings });
+        setData( bookings );
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error.message);
       } finally {
@@ -118,6 +112,9 @@ function Grid() {
     fetchData();
   }, []);
 
+
+  
+
   if (loading) return <p>Đang tải dữ liệu...</p>;
 
   return (
@@ -125,30 +122,30 @@ function Grid() {
       <main className="dashboard-main">
         <Row gutter={[20, 25]}>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
-            <StatsCard title="Tổng đặt phòng" value={data.stats.totalBookings} icon="📋" />
+            <StatsCard title="Tổng đặt phòng" value={128} icon="📋" />
           </Col>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
-            <StatsCard title="Doanh thu" value={`${data.stats.revenue.toLocaleString('vi-VN')} VND`} icon="💰" />
+            <StatsCard title="Doanh thu" value={`${'49580000'.toLocaleString('vi-VN')} VND`} icon="💰" />
           </Col>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
-            <StatsCard title="Khách hàng mới" value={data.stats.newCustomers} icon="👥" />
+            <StatsCard title="Khách hàng mới" value={28} icon="👥" />
           </Col>
           <Col xxl={16} xl={16} lg={16} md={24} sm={24} xs={24}>
             <div className="col box-5">
-              <MultiLine data={data.bookings} />
+              <MultiLine data={data.bookingList} />
             </div>
           </Col>
           <Col xxl={8} xl={8} lg={8} md={24} sm={24} xs={24}>
             <div className="col box-6">
-              <DemoRadar data={data.bookings} />
+              <DemoRadar data={data.bookingList} />
             </div>
           </Col>
           <Col xxl={24} xl={24} lg={24} md={24} sm={24} xs={24}>
-            <BookingTable bookings={data.bookings} />
+            <BookingTable bookings={data.bookingList} />
           </Col>
           <Col xxl={24} xl={24} lg={24} md={24} sm={24} xs={24}>
             <AdditionalStats
-              bookings={data.bookings}
+              bookings={data.bookingList}
             />
           </Col>
           <Col xxl={24} xl={24} lg={24} md={24} sm={24} xs={24}>
