@@ -1,46 +1,33 @@
 package com.example.hotelbookingserver.dtos;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public class BookingDTO {
     private UUID id;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
-    private String bookingConfirmationCode;
-    private UUID userId;
+    private List<LocalDate> date;
     private UUID hotelId;
     private UUID roomTypeId;
-
+    private String fullName;
+    private String email;
+    private String phone;
     private String status;
-
-    private String userFullName;
-    private String hotelName;
-    private String roomTypeName;
-
-    private String createdAt;
-    private String updatedAt;
 
     public BookingDTO() {
     }
 
-    public BookingDTO(UUID id, LocalDate checkInDate, LocalDate checkOutDate, String bookingConfirmationCode,
-            UUID userId, UUID hotelId, UUID roomTypeId, String status,
-            String userFullName, String hotelName, String roomTypeName,
-            String createdAt, String updatedAt) {
+    public BookingDTO(UUID id, List<LocalDate> date,
+            UUID hotelId, UUID roomTypeId, String status,
+            String fullName, String email, String phone) {
         this.id = id;
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
-        this.bookingConfirmationCode = bookingConfirmationCode;
-        this.userId = userId;
+        this.date = date;
         this.hotelId = hotelId;
         this.roomTypeId = roomTypeId;
         this.status = status;
-        this.userFullName = userFullName;
-        this.hotelName = hotelName;
-        this.roomTypeName = roomTypeName;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.fullName = fullName;
+        this.email = email;
+        this.phone = phone;
     }
 
     public UUID getId() {
@@ -51,36 +38,12 @@ public class BookingDTO {
         this.id = id;
     }
 
-    public LocalDate getCheckInDate() {
-        return checkInDate;
+    public List<LocalDate> getDate() {
+        return date;
     }
 
-    public void setCheckInDate(LocalDate checkInDate) {
-        this.checkInDate = checkInDate;
-    }
-
-    public LocalDate getCheckOutDate() {
-        return checkOutDate;
-    }
-
-    public void setCheckOutDate(LocalDate checkOutDate) {
-        this.checkOutDate = checkOutDate;
-    }
-
-    public String getBookingConfirmationCode() {
-        return bookingConfirmationCode;
-    }
-
-    public void setBookingConfirmationCode(String bookingConfirmationCode) {
-        this.bookingConfirmationCode = bookingConfirmationCode;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setDate(List<LocalDate> date) {
+        this.date = date;
     }
 
     public UUID getHotelId() {
@@ -107,44 +70,27 @@ public class BookingDTO {
         this.status = status;
     }
 
-    public String getUserFullName() {
-        return userFullName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setUserFullName(String userFullName) {
-        this.userFullName = userFullName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getHotelName() {
-        return hotelName;
+    public String getEmail() {
+        return email;
     }
 
-    public void setHotelName(String hotelName) {
-        this.hotelName = hotelName;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getRoomTypeName() {
-        return roomTypeName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setRoomTypeName(String roomTypeName) {
-        this.roomTypeName = roomTypeName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
 }

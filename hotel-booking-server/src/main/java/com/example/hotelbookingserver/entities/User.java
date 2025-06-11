@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +25,8 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    @Column(columnDefinition = "CHAR(36)", length = 36, updatable = false, nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
     @NotBlank(message = "Email is required")

@@ -13,10 +13,12 @@ public class Response {
     private int statusCode;
     private String message;
 
+    private String fullName;
+    private String email;
+    private String phone;
     private String token;
     private String role;
     private String expirationTime;
-    private String bookingConfirmationCode;
 
     private UserDTO user;
     private RoomTypeDTO room;
