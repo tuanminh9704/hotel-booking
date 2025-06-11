@@ -7,7 +7,6 @@ import com.example.hotelbookingserver.dtos.ImageDTO;
 import com.example.hotelbookingserver.dtos.ReviewsDTO;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 import com.example.hotelbookingserver.dtos.AmenityDTO;
-import com.example.hotelbookingserver.dtos.BookingDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

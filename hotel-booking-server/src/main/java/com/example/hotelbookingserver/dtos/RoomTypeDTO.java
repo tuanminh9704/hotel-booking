@@ -22,6 +22,7 @@ public class RoomTypeDTO {
     private int quantityRoom;
     private BigDecimal price;
     private List<AmenityDTO> amenities;
+    private List<BookingDTO> bookings;
 
     public RoomTypeDTO(UUID id, String name, int quantityBed, int quantityPeople, int roomArea, int quantityRoom,
             BigDecimal price, List<AmenityDTO> amenities) {

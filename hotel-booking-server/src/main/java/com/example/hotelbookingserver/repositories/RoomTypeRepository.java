@@ -28,6 +28,14 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, UUID> {
       """)
   List<RoomType> findAvailableRoomsByDatesAndTypes(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
 
-  @Query("SELECT r FROM RoomType r WHERE r.id NOT IN (SELECT b.roomType.id FROM Booking b)")
-  List<RoomType> getAllAvailableRooms();
+  @Query("""
+          SELECT r FROM RoomType r
+          WHERE (
+            SELECT COUNT(b) FROM Booking b
+            WHERE b.roomType = r
+              AND b.checkInDate <= :checkOutDate
+              AND b.checkOutDate >= :checkInDate
+          ) < r.quantityRoom
+      """)
+  List<RoomType> getAllAvailableRoomsByDate(LocalDate checkInDate, LocalDate checkOutDate);
 }
