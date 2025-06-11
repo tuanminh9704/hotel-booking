@@ -21,7 +21,7 @@ function ListHotel(props) {
                 <Row gutter={[20, 20]}>
                   <Col xxl={9} xl={9} lg={9} md={9} sm={24} span={24}>
                     <div className="image">
-                        <img src={item.thumbnail} alt="ảnh khách sạn"></img>
+                      <img src={item.thumbnail} alt="ảnh khách sạn"></img>
                     </div>
                   </Col>
                   <Col xxl={11} xl={11} lg={11} md={11} sm={24} span={24}>
@@ -47,7 +47,11 @@ function ListHotel(props) {
                   <Col className="card-price" xxl={4} xl={4} lg={4} md={4} sm={24} span={24}  >
                     <div className="card-price__item">
                       <p className="desc">1 đêm, 2 người lớn</p>
-                      <strong className="price">{(item.roomTypes[0].price).toLocaleString("vi-VN")} VND</strong>
+                      <strong className="price">
+                        {item.roomTypes && item.roomTypes.length > 0 && item.roomTypes[0]?.price
+                          ? `${item.roomTypes[0].price.toLocaleString("vi-VN")} VND`
+                          : "Thỏa thuận"}
+                      </strong>
                       <p className="desc">Đã bao gồm thuế và phí</p>
                       <Button type="primary"><Link to={`detail/${item.id}`}>Xem chỗ trống<RightOutlined /></Link></Button>
                     </div>

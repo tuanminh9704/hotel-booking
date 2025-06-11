@@ -7,14 +7,14 @@ import './GridHotel.scss'
 
 function GridHotel(props) {
   const { data, showPagination = true, defaultPageSize = 8 } = props;
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
 
   // Tính toán dữ liệu hiển thị cho trang hiện tại
   const currentPageData = useMemo(() => {
     if (!showPagination) return data;
-    
+
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return data?.slice(startIndex, endIndex) || [];
@@ -24,11 +24,11 @@ function GridHotel(props) {
   const handlePageChange = useCallback((page, size) => {
     setCurrentPage(page);
     setPageSize(size);
-    
+
     // Scroll to top khi chuyển trang
-    window.scrollTo({ 
-      top: 0, 
-      behavior: 'smooth' 
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
   }, []);
 
@@ -82,7 +82,11 @@ function GridHotel(props) {
                   <Col span={24} className="card-price">
                     <div className="card-price__item">
                       <p className="desc">1 đêm, 2 người lớn</p>
-                      <strong className="price">{(item.roomTypes[0].price).toLocaleString("vi-VN")} VND</strong>
+                      <strong className="price">
+                        {item.roomTypes && item.roomTypes.length > 0 && item.roomTypes[0]?.price
+                          ? `${item.roomTypes[0].price.toLocaleString("vi-VN")} VND`
+                          : "Thỏa thuận"}
+                      </strong>
                       <p className="desc">Đã bao gồm thuế và phí</p>
                       <Button type="primary">
                         <Link to={`discover/detail/${item.id}`}>Xem chỗ trống <RightOutlined /></Link>
@@ -98,9 +102,9 @@ function GridHotel(props) {
 
       {/* Pagination Component */}
       {showPagination && data && data.length > pageSize && (
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
           marginTop: '40px',
           marginBottom: '20px'
         }}>
@@ -111,7 +115,7 @@ function GridHotel(props) {
             onChange={handlePageChange}
             showSizeChanger={true}
             showQuickJumper={true}
-            showTotal={(total, range) => 
+            showTotal={(total, range) =>
               `${range[0]}-${range[1]} của ${total} khách sạn`
             }
             pageSizeOptions={['4', '8', '12', '16', '20']}
@@ -134,8 +138,8 @@ function GridHotel(props) {
 
       {/* Thông báo không có dữ liệu */}
       {(!data || data.length === 0) && (
-        <div style={{ 
-          textAlign: 'center', 
+        <div style={{
+          textAlign: 'center',
           padding: '60px 20px',
           color: '#999'
         }}>
