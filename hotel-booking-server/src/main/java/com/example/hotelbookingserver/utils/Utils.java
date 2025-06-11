@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.example.hotelbookingserver.dtos.AmenityDTO;
 import com.example.hotelbookingserver.dtos.BookingDTO;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 import com.example.hotelbookingserver.dtos.UserDTO;
@@ -87,4 +88,33 @@ public class Utils {
         return bookingList.stream().map(Utils::mapBookingEntityToBookingDTO).collect(Collectors.toList());
     }
 
+    public static RoomTypeDTO mapRoomEntityToRoomDTOPlusBookings(RoomType room) {
+        RoomTypeDTO roomDTO = new RoomTypeDTO();
+
+        roomDTO.setId(room.getId());
+        roomDTO.setName(room.getName());
+        roomDTO.setQuantityBed(room.getQuantityBed());
+        roomDTO.setQuantityPeople(room.getQuantityPeople());
+        roomDTO.setRoomArea(room.getRoomArea());
+        roomDTO.setQuantityRoom(room.getQuantityRoom());
+        roomDTO.setPrice(room.getPrice());
+
+        if (room.getBookings() != null) {
+            roomDTO.setBookings(
+                    room.getBookings().stream().map(Utils::mapBookingEntityToBookingDTO).collect(Collectors.toList()));
+        }
+        if (room.getAmenities() != null && !room.getAmenities().isEmpty()) {
+            roomDTO.setAmenities(
+                    room.getAmenities()
+                            .stream()
+                            .map(amenity -> {
+                                AmenityDTO dto = new AmenityDTO();
+                                dto.setId(amenity.getId());
+                                dto.setName(amenity.getName());
+                                return dto;
+                            })
+                            .collect(Collectors.toList()));
+        }
+        return roomDTO;
+    }
 }
