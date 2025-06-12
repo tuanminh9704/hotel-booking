@@ -10,13 +10,23 @@ import TopMenu from "../../components/TopMenu";
 import RatingFilter from "../../components/RatingFilter";
 
 
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+
+
 function Discover() {
   const [hotels, setHotels] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [keywordFromURL, setKeywordFromURL] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10); // Số hotel hiển thị mỗi trang
-  
+
   const location = useLocation();
   const param = useParams()
 
@@ -24,13 +34,17 @@ function Discover() {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("email");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("role");
   }
 
   useEffect(() => {
     const fetchAPI = async () => {
       try {
         const response = await getHotels();
-        setHotels(response);
+        setHotels(response.hotelList);
       } catch (error) {
         console.error("Lỗi khi tải danh sách khách sạn:", error);
       }
@@ -88,11 +102,11 @@ function Discover() {
   const handlePageChange = useCallback((page, size) => {
     setCurrentPage(page);
     setPageSize(size);
-    
+
     // Scroll to top khi chuyển trang
-    window.scrollTo({ 
-      top: 0, 
-      behavior: 'smooth' 
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
   }, []);
 
@@ -130,6 +144,14 @@ function Discover() {
                     <Button className="login" onClick={handleLogout}>
                       <Link>Đăng xuất</Link>
                     </Button>
+                    {token ? (
+                      <Link to="/profile" style={{marginLeft: "10px", color: "#fff", fontWeight: "500", }}>{capitalizeWords(localStorage.getItem("fullName"))}</Link>
+                    )
+                      :
+                      (
+                        <></>
+                      )
+                    }
                   </>
                 ) : (
                   <>
@@ -163,9 +185,9 @@ function Discover() {
               <Col span={19}>
                 <div>
                   {/* Hiển thị thông tin tổng quan */}
-                  <div style={{ 
-                    marginBottom: '16px', 
-                    fontSize: '14px', 
+                  <div style={{
+                    marginBottom: '16px',
+                    fontSize: '14px',
                     color: '#666',
                     textAlign: 'right'
                   }}>
@@ -174,15 +196,15 @@ function Discover() {
                       <span> cho từ khóa "<strong>{keywordFromURL}</strong>"</span>
                     )}
                   </div>
-                  
+
                   {/* Danh sách khách sạn */}
                   <ListHotel data={currentPageData} />
-                  
+
                   {/* Pagination */}
                   {filteredHotels.length > 0 && (
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'center', 
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
                       marginTop: '32px',
                       marginBottom: '20px'
                     }}>
@@ -193,7 +215,7 @@ function Discover() {
                         onChange={handlePageChange}
                         showSizeChanger={true}
                         showQuickJumper={true}
-                        showTotal={(total, range) => 
+                        showTotal={(total, range) =>
                           `${range[0]}-${range[1]} của ${total} khách sạn`
                         }
                         pageSizeOptions={['5', '10', '15', '20']}
@@ -212,11 +234,11 @@ function Discover() {
                       />
                     </div>
                   )}
-                  
+
                   {/* Thông báo không tìm thấy kết quả */}
                   {filteredHotels.length === 0 && hotels.length > 0 && (
-                    <div style={{ 
-                      textAlign: 'center', 
+                    <div style={{
+                      textAlign: 'center',
                       padding: '40px',
                       color: '#999'
                     }}>

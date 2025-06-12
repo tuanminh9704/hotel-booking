@@ -20,7 +20,7 @@ function Detail() {
     useEffect(() => {
         const fetchHotel = async () => {
             const response = await getHotelByID(param.id);
-            setData(response);
+            setData(response.hotelList[0]);
         };
         fetchHotel();
     }, [param]);
@@ -127,6 +127,8 @@ function Detail() {
             ),
         },
     ];
+
+    
 
     return (
         <>

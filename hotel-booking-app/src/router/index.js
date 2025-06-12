@@ -10,6 +10,8 @@ import ListRoom from '../pages/ListRoom';
 import LoginPage from '../pages/Login';
 import Payment from '../pages/Payment';
 import PrivateRouters from '../components/PrivateRouters';
+import Profile from '../pages/Profile';
+import { Account } from '../pages/Account';
 
 export const router = [
     {
@@ -38,6 +40,11 @@ export const router = [
         element: <PrivateRouters />,
         children: [
             {
+                path: "/profile",
+                element: <Profile/>,
+            }
+            ,
+            {
                 path: "/admin",
                 element: <LayoutDefault />,
                 children: [
@@ -48,6 +55,10 @@ export const router = [
                     {
                         path: "create-room",
                         element: <CreateRoom />
+                    },
+                    {
+                        path: "acc",
+                        element: <Account/>
                     },
                     {
                         path: "list-room",

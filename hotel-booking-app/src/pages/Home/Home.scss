@@ -42,6 +42,7 @@
       padding: calc(10px + 10vw);
       padding-top: 0;
       padding-bottom: 0;
+      display: block;
 
       .login-language {
         text-align: right;
@@ -51,6 +52,10 @@
         a {
           color: #fff;
           font-weight: 500;
+        }
+
+        .profile {
+          display: inline;
         }
       }
 

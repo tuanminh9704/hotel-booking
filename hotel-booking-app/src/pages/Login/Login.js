@@ -40,9 +40,15 @@ function Login() {
             }
 
             const response = await login(options);
+            
 
+            
             if(response.statusCode === 200){
                 localStorage.setItem("accessToken", response.token);
+                localStorage.setItem("fullName", response.fullName);
+                localStorage.setItem("email", response.email);
+                localStorage.setItem("phone", response.phone);
+                localStorage.setItem("role", response.role);
 
                 if(response.role === "ADMIN"){
                     message.success("Đăng nhập thành công");

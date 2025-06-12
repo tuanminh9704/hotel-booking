@@ -70,7 +70,7 @@ function Payment() {
             if (!hotelId) return;
             try {
                 const responseHotel = await getHotelByID(hotelId);
-                setHotel(responseHotel);
+                setHotel(responseHotel.hotelList[0]);
             } catch (error) {
                 setError('Lỗi khi lấy thông tin khách sạn.');
                 console.error('Lỗi API:', error);

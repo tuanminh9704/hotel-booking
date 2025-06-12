@@ -6,8 +6,7 @@ import StarRating from "../../components/StarRating";
 
 function ListHotel(props) {
   const { data } = props;
-
-
+  
   return (
     <>
       <Row gutter={[20, 20]} className="list-hotel">

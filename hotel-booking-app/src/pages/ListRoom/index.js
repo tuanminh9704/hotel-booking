@@ -11,7 +11,7 @@ function ListRoom() {
 
   const fetchAPI = async () => {
     const response = await getHotels();
-    setRooms(response);
+    setRooms(response.hotelList);
   }
   
   useEffect(() => {

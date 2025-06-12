@@ -15,6 +15,14 @@ import { getHotels } from "../../Service/HotelService";
 
 const { Content, Footer } = Layout;
 
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
@@ -22,22 +30,28 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6); // Số hotel hiển thị mỗi trang
   const [totalHotels, setTotalHotels] = useState(0);
-  
+
   const token = localStorage.getItem("accessToken");
-  
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("email");
+    localStorage.removeItem("phone");
+    localStorage.removeItem("role")
     navigate("/")
   }
 
   useEffect(() => {
     const fetchAPI = async () => {
       const response = await getHotels();
-      setData(response);
+      setData(response.hotelList);
       setTotalHotels(response.length);
     }
     fetchAPI();
   }, [])
+
+
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -79,8 +93,18 @@ export default function Home() {
                     <Link to='/auth'>Đăng nhập <RightOutlined /> / </Link>
                   </>
                 )}
-                
+
                 <LanguageSelector />
+                <div className="profile">
+                  {token ? (
+                    <Link to='/profile'>{capitalizeWords(localStorage.getItem("fullName"))}</Link>
+                  )
+                    :
+                    (
+                      <></>
+                    )
+                  }
+                </div>
               </div>
               <div className="logo">
                 <Link to={"/"}>HotelBooking.com</Link>
@@ -109,16 +133,16 @@ export default function Home() {
             </div>
           </div>
         </header>
-        
+
         <Content className="layout-welcome__conten">
           <h1 className="title">Gợi ý các chỗ nghỉ cho bạn</h1>
           <GridHotel data={getCurrentPageData()} />
-          
+
           {/* Pagination Component */}
           {totalHotels > 0 && (
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
               marginTop: '40px',
               marginBottom: '20px'
             }}>
@@ -129,7 +153,7 @@ export default function Home() {
                 onChange={handlePageChange}
                 showSizeChanger={true}
                 showQuickJumper={true}
-                showTotal={(total, range) => 
+                showTotal={(total, range) =>
                   `${range[0]}-${range[1]} của ${total} khách sạn`
                 }
                 pageSizeOptions={['6', '12', '18', '24']}
@@ -149,7 +173,7 @@ export default function Home() {
             </div>
           )}
         </Content>
-        
+
         <Footer className="layout-home__footer">
           2025 copyright @Nhom5
         </Footer>
