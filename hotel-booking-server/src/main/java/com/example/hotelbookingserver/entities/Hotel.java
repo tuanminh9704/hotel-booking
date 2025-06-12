@@ -1,12 +1,18 @@
 package com.example.hotelbookingserver.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Data
 @Entity
 @Table(name = "hotels")
 public class Hotel {
@@ -14,6 +20,7 @@ public class Hotel {
     @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
     @Column(nullable = false)
@@ -51,51 +58,4 @@ public class Hotel {
     @BatchSize(size = 10)
     private Set<Booking> bookings = new HashSet<>();
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public String getLinkMap() {
-        return linkMap;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public float getRate() {
-        return rate;
-    }
-
-    public String getCheckInTime() {
-        return checkInTime;
-    }
-
-    public String getCheckOutTime() {
-        return checkOutTime;
-    }
-
-    public Set<Image> getImages() {
-        return this.images;
-    }
-
-    public Set<RoomType> getRoomTypes() {
-        return this.roomTypes;
-    }
-
-    public Set<Reviews> getReviews() {
-        return this.reviews;
-    }
 }

@@ -3,7 +3,9 @@ package com.example.hotelbookingserver.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,16 +25,17 @@ public class Image {
     @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = true)
     private Hotel hotel;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")

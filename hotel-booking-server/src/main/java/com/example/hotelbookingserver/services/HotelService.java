@@ -1,9 +1,19 @@
 package com.example.hotelbookingserver.services;
 
+import com.example.hotelbookingserver.entities.Amenity;
 import com.example.hotelbookingserver.entities.Hotel;
+import com.example.hotelbookingserver.entities.Image;
+import com.example.hotelbookingserver.entities.Reviews;
+import com.example.hotelbookingserver.entities.RoomType;
+import com.example.hotelbookingserver.repositories.AmenityRepository;
 import com.example.hotelbookingserver.repositories.HotelRepository;
+import com.example.hotelbookingserver.repositories.ImageRepository;
+import com.example.hotelbookingserver.repositories.ReviewsRepository;
+import com.example.hotelbookingserver.repositories.RoomTypeRepository;
+import com.example.hotelbookingserver.utils.Utils;
 import com.example.hotelbookingserver.dtos.HotelDTO;
 import com.example.hotelbookingserver.dtos.ImageDTO;
+import com.example.hotelbookingserver.dtos.Response;
 import com.example.hotelbookingserver.dtos.ReviewsDTO;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 import com.example.hotelbookingserver.dtos.AmenityDTO;
@@ -11,65 +21,136 @@ import com.example.hotelbookingserver.dtos.AmenityDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class HotelService {
-        private final HotelRepository hotelRepository;
+public class HotelService implements IHotelService {
 
         @Autowired
-        public HotelService(HotelRepository hotelRepository) {
-                this.hotelRepository = hotelRepository;
+        private HotelRepository hotelRepository;
+
+        @Autowired
+        private ImageRepository imageRepository;
+
+        @Autowired
+        private RoomTypeRepository roomTypeRepository;
+
+        @Autowired
+        private AmenityRepository amenityRepository;
+
+        @Autowired
+        private ReviewsRepository reviewsRepository;
+
+        @Override
+        public Response getAllHotels() {
+                Response response = new Response();
+                try {
+                        List<HotelDTO> hotelDTOList = hotelRepository.getListHotels().stream()
+                                        .map(Utils::mapHotelEntityToHotelDTO)
+                                        .collect(Collectors.toList());
+
+                        response.setStatusCode(200);
+                        response.setMessage("Get hotel list successfully");
+                        response.setHotelList(hotelDTOList);
+                } catch (Exception e) {
+                        response.setStatusCode(500);
+                        response.setMessage("Error: " + e.getMessage());
+                }
+                return response;
+
         }
 
-        public List<HotelDTO> getAllHotels() {
-                return hotelRepository.getListHotels().stream()
-                                .map(this::convertToDTO)
-                                .collect(Collectors.toList());
+        @Override
+        public Response getHotelById(UUID id) {
+                Response response = new Response();
+                try {
+                        // hotelRepository.findAll().forEach(h -> System.out.println("Hotel: " +
+                        // h.getId()));
+                        Hotel hotel = hotelRepository.findById(id).orElse(null);
+
+                        if (hotel == null) {
+                                response.setStatusCode(404);
+                                response.setMessage("Hotel with ID not found: " + id);
+                        } else {
+                                HotelDTO hotelDTO = Utils.mapHotelEntityToHotelDTO(hotel);
+                                response.setStatusCode(200);
+                                response.setMessage("Hotel information successfully");
+                                response.setHotelList(List.of(hotelDTO));
+                        }
+                } catch (Exception e) {
+                        response.setStatusCode(500);
+                        response.setMessage("Error: " + e.getMessage());
+                }
+                return response;
         }
 
-        private HotelDTO convertToDTO(Hotel hotel) {
-                List<ImageDTO> images = hotel.getImages().stream()
-                                .map(image -> new ImageDTO(image.getId(), image.getImageUrl()))
-                                .collect(Collectors.toList());
+        @Override
+        public Response addHotel(HotelDTO requestDTO) {
+                Response response = new Response();
+                try {
+                        Hotel hotel = new Hotel();
+                        hotel.setName(requestDTO.getName());
+                        hotel.setThumbnail(requestDTO.getThumbnail());
+                        hotel.setAddress(requestDTO.getAddress());
+                        hotel.setLinkMap(requestDTO.getLinkMap());
+                        hotel.setDescription(requestDTO.getDescription());
+                        hotel.setRate(requestDTO.getRate());
+                        hotel.setCheckInTime(requestDTO.getCheckInTime());
+                        hotel.setCheckOutTime(requestDTO.getCheckOutTime());
 
-                List<ReviewsDTO> reviews = hotel.getReviews().stream()
-                                .map(review -> new ReviewsDTO(review.getId(), review.getRating(), review.getContent()))
-                                .collect(Collectors.toList());
+                        Hotel savedHotel = hotelRepository.save(hotel);
 
-                List<RoomTypeDTO> roomTypes = hotel.getRoomTypes().stream()
-                                .map(roomType -> {
-                                        List<AmenityDTO> amenities = roomType.getAmenities().stream()
-                                                        .map(amenity -> new AmenityDTO(amenity.getId(),
-                                                                        amenity.getName(), roomType.getId()))
-                                                        .collect(Collectors.toList());
+                        if (requestDTO.getImages() != null) {
+                                for (ImageDTO imgDTO : requestDTO.getImages()) {
+                                        Image image = new Image();
+                                        image.setImageUrl(imgDTO.getImageUrl());
+                                        image.setHotel(savedHotel);
+                                        imageRepository.save(image);
+                                }
+                        }
 
-                                        RoomTypeDTO roomTypeDTO = new RoomTypeDTO(
-                                                        roomType.getId(),
-                                                        roomType.getName(),
-                                                        roomType.getQuantityBed(),
-                                                        roomType.getQuantityPeople(),
-                                                        roomType.getRoomArea(),
-                                                        roomType.getQuantityRoom(),
-                                                        roomType.getPrice(),
-                                                        amenities);
+                        if (requestDTO.getRoomTypes() != null) {
+                                for (RoomTypeDTO rtDTO : requestDTO.getRoomTypes()) {
+                                        RoomType roomType = new RoomType();
+                                        roomType.setName(rtDTO.getName());
+                                        roomType.setQuantityBed(rtDTO.getQuantityBed());
+                                        roomType.setQuantityPeople(rtDTO.getQuantityPeople());
+                                        roomType.setRoomArea(rtDTO.getRoomArea());
+                                        roomType.setQuantityRoom(rtDTO.getQuantityRoom());
+                                        roomType.setPrice(rtDTO.getPrice());
+                                        roomType.setHotel(savedHotel);
+                                        RoomType savedRoomType = roomTypeRepository.save(roomType);
 
-                                        return roomTypeDTO;
-                                })
-                                .collect(Collectors.toList());
+                                        if (rtDTO.getAmenities() != null) {
+                                                for (AmenityDTO amenityDTO : rtDTO.getAmenities()) {
+                                                        Amenity amenity = new Amenity();
+                                                        amenity.setName(amenityDTO.getName());
+                                                        amenity.setRoomType(savedRoomType);
+                                                        amenityRepository.save(amenity);
+                                                }
+                                        }
+                                }
+                        }
 
-                return new HotelDTO(
-                                hotel.getId(),
-                                hotel.getName(),
-                                hotel.getThumbnail(),
-                                hotel.getAddress(),
-                                hotel.getLinkMap(),
-                                hotel.getDescription(),
-                                hotel.getRate(),
-                                hotel.getCheckInTime(),
-                                hotel.getCheckOutTime(),
-                                images,
-                                roomTypes,
-                                reviews);
+                        if (requestDTO.getReviews() != null) {
+                                for (ReviewsDTO rDTO : requestDTO.getReviews()) {
+                                        Reviews review = new Reviews();
+                                        review.setRating(rDTO.getRating());
+                                        review.setContent(rDTO.getContent());
+                                        review.setHotel(savedHotel);
+                                        reviewsRepository.save(review);
+                                }
+                        }
+
+                        response.setStatusCode(201);
+                        response.setMessage("Add full hotel successfully");
+                        response.setHotelList(List.of(Utils.mapHotelEntityToHotelDTO(savedHotel)));
+                } catch (Exception e) {
+                        response.setStatusCode(500);
+                        response.setMessage("Error adding hotel" + e.getMessage());
+                }
+
+                return response;
         }
 }

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "amenities")
@@ -14,6 +16,7 @@ public class Amenity {
     @GeneratedValue
     @UuidGenerator
     @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)

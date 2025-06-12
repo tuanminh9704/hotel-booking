@@ -10,10 +10,14 @@ import java.util.stream.Collectors;
 
 import com.example.hotelbookingserver.dtos.AmenityDTO;
 import com.example.hotelbookingserver.dtos.BookingDTO;
+import com.example.hotelbookingserver.dtos.HotelDTO;
+import com.example.hotelbookingserver.dtos.ImageDTO;
+import com.example.hotelbookingserver.dtos.ReviewsDTO;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 import com.example.hotelbookingserver.dtos.UserDTO;
 import com.example.hotelbookingserver.entities.Amenity;
 import com.example.hotelbookingserver.entities.Booking;
+import com.example.hotelbookingserver.entities.Hotel;
 import com.example.hotelbookingserver.entities.RoomType;
 import com.example.hotelbookingserver.entities.User;
 
@@ -117,4 +121,53 @@ public class Utils {
         }
         return roomDTO;
     }
+
+    public static HotelDTO mapHotelEntityToHotelDTO(Hotel hotel) {
+        HotelDTO hotelDTO = new HotelDTO();
+
+        List<ImageDTO> images = hotel.getImages().stream()
+                .map(image -> new ImageDTO(image.getId(), image.getImageUrl()))
+                .collect(Collectors.toList());
+
+        List<ReviewsDTO> reviews = hotel.getReviews().stream()
+                .map(review -> new ReviewsDTO(review.getId(), review.getRating(), review.getContent()))
+                .collect(Collectors.toList());
+
+        List<RoomTypeDTO> roomTypes = hotel.getRoomTypes().stream()
+                .map(roomType -> {
+                    List<AmenityDTO> amenities = roomType.getAmenities().stream()
+                            .map(amenity -> new AmenityDTO(
+                                    amenity.getId(),
+                                    amenity.getName(),
+                                    roomType.getId()))
+                            .collect(Collectors.toList());
+
+                    return new RoomTypeDTO(
+                            roomType.getId(),
+                            roomType.getName(),
+                            roomType.getQuantityBed(),
+                            roomType.getQuantityPeople(),
+                            roomType.getRoomArea(),
+                            roomType.getQuantityRoom(),
+                            roomType.getPrice(),
+                            amenities);
+                })
+                .collect(Collectors.toList());
+
+        hotelDTO.setId(hotel.getId());
+        hotelDTO.setName(hotel.getName());
+        hotelDTO.setThumbnail(hotel.getThumbnail());
+        hotelDTO.setAddress(hotel.getAddress());
+        hotelDTO.setLinkMap(hotel.getLinkMap());
+        hotelDTO.setDescription(hotel.getDescription());
+        hotelDTO.setRate(hotel.getRate());
+        hotelDTO.setCheckInTime(hotel.getCheckInTime());
+        hotelDTO.setCheckOutTime(hotel.getCheckOutTime());
+        hotelDTO.setImages(images);
+        hotelDTO.setRoomTypes(roomTypes);
+        hotelDTO.setReviews(reviews);
+
+        return hotelDTO;
+    }
+
 }

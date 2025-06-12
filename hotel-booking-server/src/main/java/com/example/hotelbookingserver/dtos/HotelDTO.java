@@ -17,7 +17,12 @@ public class HotelDTO {
     private List<RoomTypeDTO> roomTypes;
     private List<ReviewsDTO> reviews;
 
-    public HotelDTO(UUID id, String name, String thumbnail, String address, String linkMap, String description, float rate, String checkInTime, String checkOutTime, List<ImageDTO> images, List<RoomTypeDTO> roomTypes, List<ReviewsDTO> reviews) {
+    public HotelDTO() {
+    }
+
+    public HotelDTO(UUID id, String name, String thumbnail, String address, String linkMap, String description,
+            float rate, String checkInTime, String checkOutTime, List<ImageDTO> images, List<RoomTypeDTO> roomTypes,
+            List<ReviewsDTO> reviews) {
         this.id = id;
         this.name = name;
         this.thumbnail = thumbnail;
@@ -120,7 +125,12 @@ public class HotelDTO {
         this.roomTypes = roomTypes;
     }
 
-    public List<ReviewsDTO> getReviews(){
+    public List<ReviewsDTO> getReviews() {
         return reviews;
     }
+
+    public void setReviews(List<ReviewsDTO> reviews) {
+        this.reviews = reviews;
+    }
+
 }
