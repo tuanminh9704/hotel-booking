@@ -48,6 +48,7 @@ public class RoomController {
         }
 
         Response response = roomService.addNewRoom(
+                request.getHotelId(),
                 request.getName(),
                 request.getQuantityBed(),
                 request.getQuantityPeople(),
@@ -74,7 +75,7 @@ public class RoomController {
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @GetMapping("/all-available-rooms")// loi
+    @GetMapping("/all-available-rooms") // loi
     public ResponseEntity<Response> getAvailableRooms(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate) {
