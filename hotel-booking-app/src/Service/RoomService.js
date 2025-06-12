@@ -4,8 +4,8 @@ export const createRoom = async (options) => {
     return await post('rooms', options);
 };
 
-export const getListRoom = async () => {
-    return await get('rooms');
+export const getRoomById = async (id) => {
+    return await get(`rooms/room-by-id/${id}`);
 };
 
 export const deleteRoom = async (id) => {

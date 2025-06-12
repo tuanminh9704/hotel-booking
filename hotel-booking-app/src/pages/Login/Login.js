@@ -1,7 +1,13 @@
 import { Button, Checkbox, Form, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { message } from 'antd';
-import { login } from "../../Service/UserServices";
+import { getAllUser, login } from "../../Service/UserServices";
+
+const getUsersId = async (email) => {
+    const response = await getAllUser();
+    const data = response.userList.find(item => item.email == email);
+    localStorage.setItem("userId", data.id );
+}
 
 function Login() {
     const navigate = useNavigate();
@@ -18,8 +24,6 @@ function Login() {
             return "Neither";
         }
     }
-
-
 
     const onFinish = async (values) => {
         try {
@@ -39,16 +43,17 @@ function Login() {
                 password: password,
             }
 
-            const response = await login(options);
-            
-
+            const response = await login(options);            
             
             if(response.statusCode === 200){
                 localStorage.setItem("accessToken", response.token);
+                getUsersId(response.email);
                 localStorage.setItem("fullName", response.fullName);
                 localStorage.setItem("email", response.email);
                 localStorage.setItem("phone", response.phone);
                 localStorage.setItem("role", response.role);
+
+               
 
                 if(response.role === "ADMIN"){
                     message.success("Đăng nhập thành công");

@@ -38,6 +38,7 @@ function Discover() {
     localStorage.removeItem("email");
     localStorage.removeItem("phone");
     localStorage.removeItem("role");
+    localStorage.removeItem("userId")
   }
 
   useEffect(() => {
@@ -45,6 +46,8 @@ function Discover() {
       try {
         const response = await getHotels();
         setHotels(response.hotelList);
+        console.log(response);
+        
       } catch (error) {
         console.error("Lỗi khi tải danh sách khách sạn:", error);
       }

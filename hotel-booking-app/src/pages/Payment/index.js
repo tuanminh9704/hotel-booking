@@ -20,28 +20,26 @@ function Payment() {
 
     const bookingData = location.state?.bookingData;
 
-    const hotelId = bookingData?.hotelId?.trim();
-    const roomTypeId = bookingData?.roomTypeId?.trim();
-    const date = bookingData?.date;
+    const hotelId = bookingData?.hotel_id?.trim();
+    const roomTypeId = bookingData?.room_type_id?.trim();
+    const userId = localStorage.getItem("userId");
+    const checkInDate = bookingData?.check_in_date;
+    const checkOutDate = bookingData?.check_out_date;
     const currency = 'VND';
 
-    const formattedDate = bookingData && Array.isArray(date) && date.length === 2
-    ? (() => {
-        const start = new Date(date[0]);
-        const end = new Date(date[1]);
-        if (isValid(start) && isValid(end)) {
-            return `${format(start, 'dd/MM/yyyy')} - ${format(end, 'dd/MM/yyyy')}`;
-        } else {
-            return 'Không xác định';
-        }
-    })()
-    : 'Không xác định';
+    const formattedDate =
+        checkInDate && checkOutDate &&
+            isValid(new Date(checkInDate)) &&
+            isValid(new Date(checkOutDate))
+            ? `${format(new Date(checkInDate), 'dd/MM/yyyy')} - ${format(new Date(checkOutDate), 'dd/MM/yyyy')}`
+            : 'Không xác định';
+
 
     const handlePayment = async (values) => {
 
         const fetchAPI = async (option) => {
             const response = await bookRoom(option);
-            if(response) {
+            if (response) {
                 alert("đặt phòng thành công")
             }
         }
@@ -55,7 +53,7 @@ function Payment() {
         setIsLoading(true);
         try {
             console.log('Thông tin thanh toán:', { ...bookingData, ...values });
-            fetchAPI({ ...bookingData, ...values });
+            fetchAPI({ ...bookingData, ...values, user_id: userId });
             navigate('/', { state: { bookingData, guestInfo: values } });
         } catch (error) {
             setError('Thanh toán thất bại. Vui lòng thử lại.');

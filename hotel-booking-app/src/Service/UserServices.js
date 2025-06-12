@@ -5,16 +5,16 @@ export const createUser = async (options) => {
     return await post('auth/register',options);
 }
 
-export const getUserByEmail = async (email) => {
-    return await get(`auth/user?email=${email}`);
+export const delUserById = async (id) => {
+    return await del(`users/delete/${id}`);
 }
 
 export const login = async (options) => {
     return await post(`auth/login`, options);
 }
 
-export const getUserByPhone = async (phone) => {
-    return await get(`auth/user?phone=${phone}`);
+export const getAllUser = async () => {
+    return await get(`users/all`);
 }
 
 export const deleteRoom = async (id) => {

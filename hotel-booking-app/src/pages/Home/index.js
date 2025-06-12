@@ -38,7 +38,8 @@ export default function Home() {
     localStorage.removeItem("fullName");
     localStorage.removeItem("email");
     localStorage.removeItem("phone");
-    localStorage.removeItem("role")
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId")
     navigate("/")
   }
 

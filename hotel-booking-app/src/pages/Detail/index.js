@@ -42,16 +42,19 @@ function Detail() {
     };
 
     const handleFormSubmit = () => {
-        if (time && selectedRoomTypeId) {
-            const formattedDates = time.map(date => date.format("DD/MM/YYYY"));
-            const bookingData = {
-                hotelId: param.id,
-                roomTypeId: selectedRoomTypeId,
-                date: formattedDates,
-            };
-            navigate("/payment", { state: { bookingData } });
-        }
-    };
+    if (time && selectedRoomTypeId) {
+        const [check_in_date, check_out_date] = time.map(date => date.format("DD/MM/YYYY"));
+
+        const bookingData = {
+            hotel_id: param.id,
+            room_type_id: selectedRoomTypeId,
+            check_in_date: check_in_date,
+            check_out_date: check_out_date,
+        };
+
+        navigate("/payment", { state: { bookingData } });
+    }
+};
 
     const dataSource = data?.roomTypes ?? [];
 
@@ -115,10 +118,10 @@ function Detail() {
             dataIndex: 'id',
             key: 'action',
             render: (id, record) => (
-                <Tooltip title={(!time && "Hãy chọn ngày đặt trước!") || (record.availableRooms === 0 && "Hết phòng trống!")}>
+                <Tooltip title={(!time && "Hãy chọn ngày đặt trước!") || (record.availableRooms === 0 && "Hết phòng trống!" || localStorage.getItem("userId") && "Vui lòng đăng nhập trước!")}>
                     <Button
                         type="primary"
-                        disabled={!time || record.availableRooms === 0}
+                        disabled={!time || record.availableRooms === 0 || localStorage.getItem("userId")}
                         onClick={() => handleBookRoom(id)}
                     >
                         Đặt ngay
