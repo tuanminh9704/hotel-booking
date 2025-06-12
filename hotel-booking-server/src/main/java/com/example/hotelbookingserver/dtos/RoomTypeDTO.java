@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoomTypeDTO {
     private UUID id;
+    private UUID hotelId;
     private String name;
     private int quantityBed;
     private int quantityPeople;

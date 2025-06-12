@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,25 @@ public class RoomTypeService implements IRoomTypeService {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
 
+    @Autowired
+    private HotelRepository hotelRepository;
+
     @Override
-    public Response addNewRoom(String name, int quantityBed, int quantityPeople, int roomArea, BigDecimal price,
+    public Response addNewRoom(UUID hotelId, String name, int quantityBed, int quantityPeople, int roomArea,
+            BigDecimal price,
             int quantityRoom) {
         Response response = new Response();
 
         try {
+            Optional<Hotel> optionalHotel = hotelRepository.findById(hotelId);
+            if (!optionalHotel.isPresent()) {
+                response.setStatusCode(404);
+                response.setMessage("Hotel with ID " + hotelId + " not found.");
+                return response;
+            }
+
+            Hotel hotel = optionalHotel.get();
+
             RoomType roomType = new RoomType();
             roomType.setName(name);
             roomType.setQuantityBed(quantityBed);
@@ -39,17 +53,20 @@ public class RoomTypeService implements IRoomTypeService {
             roomType.setRoomArea(roomArea);
             roomType.setPrice(price);
             roomType.setQuantityRoom(quantityRoom);
+            roomType.setHotel(hotel); // Gán Hotel vào RoomType
 
             RoomType savedRoom = roomTypeRepository.save(roomType);
             RoomTypeDTO roomTypeDTO = Utils.mapRoomEntityToRoomDTO(savedRoom);
+
             response.setStatusCode(200);
-            response.setMessage("successful");
+            response.setMessage("Room added successfully");
             response.setRoom(roomTypeDTO);
 
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage("Error saving a room " + e.getMessage());
+            response.setMessage("Error saving a room: " + e.getMessage());
         }
+
         return response;
     }
 

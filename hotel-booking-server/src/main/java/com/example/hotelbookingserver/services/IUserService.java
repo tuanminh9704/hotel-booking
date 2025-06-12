@@ -1,5 +1,7 @@
 package com.example.hotelbookingserver.services;
 
+import java.util.UUID;
+
 import com.example.hotelbookingserver.dtos.LoginRequest;
 import com.example.hotelbookingserver.dtos.Response;
 import com.example.hotelbookingserver.entities.User;
@@ -9,14 +11,14 @@ public interface IUserService {
 
     Response login(LoginRequest loginRequest);
 
-    // Response getAllUsers();
+    Response getAllUsers();
 
-    // Response getUserBookingHistory(String userId);
+    Response getUserBookingHistory(UUID userId);
 
-    // Response deleteUser(String userId);
+    Response deleteUser(UUID userId);
 
-    // Response getUserById(String userId);
+    Response getUserById(UUID userId);
 
-    // Response getMyInfo(String email);
+    Response getMyInfo(String email);
 
 }

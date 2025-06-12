@@ -8,21 +8,23 @@ import java.util.UUID;
 import com.example.hotelbookingserver.dtos.Response;
 
 public interface IRoomTypeService {
-    Response addNewRoom(String name, int quantityBed, int quantityPeople, int roomArea, BigDecimal price,
-            int quantityRoom);
+        Response addNewRoom(UUID hotelId, String name, int quantityBed, int quantityPeople, int roomArea,
+                        BigDecimal price,
+                        int quantityRoom);
 
-    List<String> getAllRoomTypeNames();
+        List<String> getAllRoomTypeNames();
 
-    Response getAllRoomTypes();
+        Response getAllRoomTypes();
 
-    Response deleteRoom(UUID roomId);
+        Response deleteRoom(UUID roomId);
 
-    Response updateRoom(UUID roomId, String name, int quantityBed, int quantityPeople, int roomArea, BigDecimal price,
-            int quantityRoom);
+        Response updateRoom(UUID roomId, String name, int quantityBed, int quantityPeople, int roomArea,
+                        BigDecimal price,
+                        int quantityRoom);
 
-    Response getRoomById(UUID roomId);
+        Response getRoomById(UUID roomId);
 
-    Response getAvailableRoomsByDataAndType(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
+        Response getAvailableRoomsByDataAndType(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
 
-    Response getAllAvailableRoomsByDate(LocalDate checkInDate, LocalDate checkOutDate);
+        Response getAllAvailableRoomsByDate(LocalDate checkInDate, LocalDate checkOutDate);
 }
