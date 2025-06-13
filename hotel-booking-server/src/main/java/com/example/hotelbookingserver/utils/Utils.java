@@ -18,6 +18,7 @@ import com.example.hotelbookingserver.dtos.UserDTO;
 import com.example.hotelbookingserver.entities.Amenity;
 import com.example.hotelbookingserver.entities.Booking;
 import com.example.hotelbookingserver.entities.Hotel;
+import com.example.hotelbookingserver.entities.Image;
 import com.example.hotelbookingserver.entities.RoomType;
 import com.example.hotelbookingserver.entities.User;
 
@@ -175,16 +176,20 @@ public class Utils {
     public static HotelDTO mapHotelEntityToHotelDTO(Hotel hotel) {
         HotelDTO hotelDTO = new HotelDTO();
 
+        // Ánh xạ danh sách ảnh khách sạn
         List<ImageDTO> images = hotel.getImages().stream()
                 .map(image -> new ImageDTO(image.getId(), image.getImageUrl()))
                 .collect(Collectors.toList());
 
+        // Ánh xạ đánh giá
         List<ReviewsDTO> reviews = hotel.getReviews().stream()
                 .map(review -> new ReviewsDTO(review.getId(), review.getRating(), review.getContent()))
                 .collect(Collectors.toList());
 
+        // Ánh xạ danh sách RoomType
         List<RoomTypeDTO> roomTypes = hotel.getRoomTypes().stream()
                 .map(roomType -> {
+                    // ánh xạ tiện nghi
                     List<AmenityDTO> amenities = roomType.getAmenities().stream()
                             .map(amenity -> new AmenityDTO(
                                     amenity.getId(),
@@ -192,18 +197,36 @@ public class Utils {
                                     roomType.getId()))
                             .collect(Collectors.toList());
 
+                    // ánh xạ bookings
+                    List<BookingDTO> bookings = roomType.getBookings() != null
+                            ? roomType.getBookings().stream()
+                                    .map(Utils::mapBookingEntityToBookingDTO)
+                                    .collect(Collectors.toList())
+                            : null;
+
+                    // ánh xạ url ảnh
+                    List<String> imageFiles = roomType.getImages() != null
+                            ? roomType.getImages().stream()
+                                    .map(Image::getImageUrl)
+                                    .collect(Collectors.toList())
+                            : null;
+
                     return new RoomTypeDTO(
                             roomType.getId(),
+                            hotel.getId(), // hotelId
                             roomType.getName(),
                             roomType.getQuantityBed(),
                             roomType.getQuantityPeople(),
                             roomType.getRoomArea(),
                             roomType.getQuantityRoom(),
                             roomType.getPrice(),
-                            amenities);
+                            amenities,
+                            bookings,
+                            imageFiles);
                 })
                 .collect(Collectors.toList());
 
+        // Thiết lập thông tin cho HotelDTO
         hotelDTO.setId(hotel.getId());
         hotelDTO.setName(hotel.getName());
         hotelDTO.setThumbnail(hotel.getThumbnail());

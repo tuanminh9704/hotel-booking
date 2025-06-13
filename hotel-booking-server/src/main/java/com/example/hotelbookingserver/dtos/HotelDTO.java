@@ -1,6 +1,9 @@
 package com.example.hotelbookingserver.dtos;
 
 import java.util.UUID;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class HotelDTO {

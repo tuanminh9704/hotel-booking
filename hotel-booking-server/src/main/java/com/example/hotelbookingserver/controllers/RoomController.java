@@ -39,7 +39,6 @@ public class RoomController {
     @PostMapping("/add")
     // @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> addNewRoom(@RequestBody RoomTypeDTO request) {
-
         if (request.getName() == null || request.getName().isEmpty() || request.getPrice() == null) {
             Response response = new Response();
             response.setStatusCode(400);
@@ -47,14 +46,7 @@ public class RoomController {
             return ResponseEntity.status(response.getStatusCode()).body(response);
         }
 
-        Response response = roomService.addNewRoom(
-                request.getHotelId(),
-                request.getName(),
-                request.getQuantityBed(),
-                request.getQuantityPeople(),
-                request.getRoomArea(),
-                request.getPrice(),
-                request.getQuantityRoom());
+        Response response = roomService.addNewRoom(request);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
@@ -110,15 +102,7 @@ public class RoomController {
             @PathVariable UUID roomId,
             @RequestBody RoomTypeDTO roomTypeDTO) {
 
-        Response response = roomService.updateRoom(
-                roomId,
-                roomTypeDTO.getName(),
-                roomTypeDTO.getQuantityBed(),
-                roomTypeDTO.getQuantityPeople(),
-                roomTypeDTO.getRoomArea(),
-                roomTypeDTO.getPrice(),
-                roomTypeDTO.getQuantityRoom());
-
+        Response response = roomService.updateRoom(roomTypeDTO, roomId);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 

@@ -10,15 +10,18 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.example.hotelbookingserver.dtos.AmenityDTO;
 import com.example.hotelbookingserver.dtos.Response;
 import com.example.hotelbookingserver.dtos.RoomTypeDTO;
+import com.example.hotelbookingserver.entities.Amenity;
 import com.example.hotelbookingserver.entities.Hotel;
+import com.example.hotelbookingserver.entities.Image;
 import com.example.hotelbookingserver.entities.RoomType;
 import com.example.hotelbookingserver.exception.OurException;
-import com.example.hotelbookingserver.repositories.BookingRepository;
+import com.example.hotelbookingserver.repositories.AmenityRepository;
 import com.example.hotelbookingserver.repositories.HotelRepository;
+import com.example.hotelbookingserver.repositories.ImageRepository;
 import com.example.hotelbookingserver.repositories.RoomTypeRepository;
 import com.example.hotelbookingserver.utils.Utils;
 
@@ -28,43 +31,65 @@ public class RoomTypeService implements IRoomTypeService {
     private RoomTypeRepository roomTypeRepository;
 
     @Autowired
+    private AmenityRepository amenityRepository;
+
+    @Autowired
     private HotelRepository hotelRepository;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     @Override
-    public Response addNewRoom(UUID hotelId, String name, int quantityBed, int quantityPeople, int roomArea,
-            BigDecimal price,
-            int quantityRoom) {
+    public Response addNewRoom(RoomTypeDTO dto) {
         Response response = new Response();
 
         try {
-            Optional<Hotel> optionalHotel = hotelRepository.findById(hotelId);
+            Optional<Hotel> optionalHotel = hotelRepository.findById(dto.getHotelId());
             if (!optionalHotel.isPresent()) {
                 response.setStatusCode(404);
-                response.setMessage("Hotel with ID " + hotelId + " not found.");
+                response.setMessage("Hotel with ID " + dto.getHotelId() + " not found.");
                 return response;
             }
 
             Hotel hotel = optionalHotel.get();
 
             RoomType roomType = new RoomType();
-            roomType.setName(name);
-            roomType.setQuantityBed(quantityBed);
-            roomType.setQuantityPeople(quantityPeople);
-            roomType.setRoomArea(roomArea);
-            roomType.setPrice(price);
-            roomType.setQuantityRoom(quantityRoom);
-            roomType.setHotel(hotel); // Gán Hotel vào RoomType
+            roomType.setName(dto.getName());
+            roomType.setQuantityBed(dto.getQuantityBed());
+            roomType.setQuantityPeople(dto.getQuantityPeople());
+            roomType.setRoomArea(dto.getRoomArea());
+            roomType.setPrice(dto.getPrice());
+            roomType.setQuantityRoom(dto.getQuantityRoom());
+            roomType.setHotel(hotel);
 
-            RoomType savedRoom = roomTypeRepository.save(roomType);
-            RoomTypeDTO roomTypeDTO = Utils.mapRoomEntityToRoomDTO(savedRoom);
+            RoomType savedRoomType = roomTypeRepository.save(roomType);
 
-            response.setStatusCode(200);
+            if (dto.getAmenities() != null) {
+                for (AmenityDTO amenityDTO : dto.getAmenities()) {
+                    Amenity amenity = new Amenity();
+                    amenity.setName(amenityDTO.getName());
+                    amenity.setRoomType(savedRoomType);
+                    amenityRepository.save(amenity);
+                }
+            }
+
+            if (dto.getImageFiles() != null && !dto.getImageFiles().isEmpty()) {
+                for (String url : dto.getImageFiles()) {
+                    Image image = new Image();
+                    image.setRoomType(savedRoomType);
+                    image.setImageUrl(url);
+                    imageRepository.save(image);
+                }
+            }
+
+            RoomTypeDTO responseDTO = Utils.mapRoomEntityToRoomDTO(savedRoomType);
+            response.setStatusCode(201);
             response.setMessage("Room added successfully");
-            response.setRoom(roomTypeDTO);
+            response.setRoom(responseDTO);
 
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage("Error saving a room: " + e.getMessage());
+            response.setMessage("Error adding room: " + e.getMessage());
         }
 
         return response;
@@ -175,25 +200,36 @@ public class RoomTypeService implements IRoomTypeService {
     }
 
     @Override
-    public Response updateRoom(UUID roomId, String name, int quantityBed, int quantityPeople, int roomArea,
-            BigDecimal price, int quantityRoom) {
+    public Response updateRoom(RoomTypeDTO dto, UUID roomId) {
         Response response = new Response();
 
         try {
-            RoomType room = roomTypeRepository.findById(roomId).orElseThrow(() -> new OurException("Room Not Found"));
-            if (name != null)
-                room.setName(name);
-            room.setQuantityBed(quantityBed);
-            room.setQuantityPeople(quantityPeople);
-            room.setRoomArea(roomArea);
-            room.setPrice(price);
-            room.setQuantityRoom(quantityRoom);
+            RoomType room = roomTypeRepository.findById(roomId)
+                    .orElseThrow(() -> new OurException("Room Not Found"));
+
+            // Cập nhật các trường cơ bản
+            if (dto.getName() != null)
+                room.setName(dto.getName());
+            room.setQuantityBed(dto.getQuantityBed());
+            room.setQuantityPeople(dto.getQuantityPeople());
+            room.setRoomArea(dto.getRoomArea());
+            room.setPrice(dto.getPrice());
+            room.setQuantityRoom(dto.getQuantityRoom());
 
             RoomType updatedRoom = roomTypeRepository.save(room);
-            RoomTypeDTO roomDTO = Utils.mapRoomEntityToRoomDTO(updatedRoom);
 
+            if (dto.getImageFiles() != null && !dto.getImageFiles().isEmpty()) {
+                for (String url : dto.getImageFiles()) {
+                    Image image = new Image();
+                    image.setRoomType(updatedRoom);
+                    image.setImageUrl(url);
+                    imageRepository.save(image);
+                }
+            }
+
+            RoomTypeDTO roomDTO = Utils.mapRoomEntityToRoomDTO(updatedRoom);
             response.setStatusCode(200);
-            response.setMessage("successful");
+            response.setMessage("Cập nhật phòng thành công.");
             response.setRoom(roomDTO);
 
         } catch (OurException e) {
@@ -201,8 +237,9 @@ public class RoomTypeService implements IRoomTypeService {
             response.setMessage(e.getMessage());
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage("Error saving a room " + e.getMessage());
+            response.setMessage("Lỗi khi cập nhậtphòng: " + e.getMessage());
         }
+
         return response;
     }
 }

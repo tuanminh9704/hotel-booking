@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 import com.example.hotelbookingserver.dtos.Response;
+import com.example.hotelbookingserver.dtos.RoomTypeDTO;
 
 public interface IRoomTypeService {
-        Response addNewRoom(UUID hotelId, String name, int quantityBed, int quantityPeople, int roomArea,
-                        BigDecimal price,
-                        int quantityRoom);
+        Response addNewRoom(RoomTypeDTO dto);
 
         List<String> getAllRoomTypeNames();
 
@@ -18,9 +17,7 @@ public interface IRoomTypeService {
 
         Response deleteRoom(UUID roomId);
 
-        Response updateRoom(UUID roomId, String name, int quantityBed, int quantityPeople, int roomArea,
-                        BigDecimal price,
-                        int quantityRoom);
+        Response updateRoom(RoomTypeDTO dto, UUID roomId);
 
         Response getRoomById(UUID roomId);
 
