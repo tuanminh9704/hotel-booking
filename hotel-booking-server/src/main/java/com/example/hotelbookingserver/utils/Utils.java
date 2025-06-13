@@ -229,4 +229,17 @@ public class Utils {
         return userList.stream().map(Utils::mapUserEntityToUserDTO).collect(Collectors.toList());
     }
 
+    public static AmenityDTO mapAmenityEntityToAmenityDTO(Amenity amenity) {
+        AmenityDTO dto = new AmenityDTO();
+        dto.setId(amenity.getId());
+        dto.setName(amenity.getName());
+        dto.setRoomTypeId(amenity.getRoomType() != null ? amenity.getRoomType().getId() : null);
+        return dto;
+    }
+
+    public static List<AmenityDTO> mapAmenityListEntityToDTOList(List<Amenity> amenities) {
+        return amenities.stream()
+                .map(Utils::mapAmenityEntityToAmenityDTO)
+                .collect(Collectors.toList());
+    }
 }

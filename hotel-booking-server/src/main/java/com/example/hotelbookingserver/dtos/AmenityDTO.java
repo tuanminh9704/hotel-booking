@@ -2,12 +2,16 @@ package com.example.hotelbookingserver.dtos;
 
 import java.util.UUID;
 
+import lombok.Data;
+
+@Data
 public class AmenityDTO {
     private UUID id;
     private String name;
     private UUID roomTypeId;
 
-    public AmenityDTO() {}
+    public AmenityDTO() {
+    }
 
     public AmenityDTO(UUID id, String name, UUID roomTypeId) {
         this.id = id;
