@@ -3,6 +3,7 @@ package com.example.hotelbookingserver.services;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -68,12 +69,15 @@ public class BookingService implements IBookingService {
 
     @Override
     public Response getAllBookings() {
-
         Response response = new Response();
 
         try {
             List<Booking> bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-            List<BookingDTO> bookingDTOList = Utils.mapBookingListEntityToBookingListDTO(bookingList);
+
+            List<BookingDTO> bookingDTOList = bookingList.stream()
+                    .map(booking -> Utils.mapBookingEntityToBookingDTOPlusBookedRooms(booking, true))
+                    .collect(Collectors.toList());
+
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setBookingList(bookingDTOList);
@@ -85,8 +89,8 @@ public class BookingService implements IBookingService {
         } catch (Exception e) {
             response.setStatusCode(500);
             response.setMessage("Error Getting all bookings: " + e.getMessage());
-
         }
+
         return response;
     }
 

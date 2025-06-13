@@ -44,18 +44,15 @@ public class Utils {
         // Set userId
         if (booking.getUser() != null) {
             bookingDTO.setUserId(booking.getUser().getId());
-
         }
 
         // Set hotelId
         if (booking.getRoomType() != null) {
             bookingDTO.setRoomTypeId(booking.getRoomType().getId());
-
             if (booking.getRoomType().getHotel() != null) {
                 bookingDTO.setHotelId(booking.getRoomType().getHotel().getId());
             }
         }
-
 
         bookingDTO.setCheckInDate(booking.getCheckInDate());
         bookingDTO.setCheckOutDate(booking.getCheckOutDate());

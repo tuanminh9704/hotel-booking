@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Avatar, Button, Typography, Space, Table, Tag } from "antd";
 import {
-    EditOutlined,
     MailOutlined,
     PhoneOutlined,
     UserOutlined,
@@ -9,9 +8,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import "./Profile.scss";
-import { getAllUser, getUserById } from "../../Service/UserServices";
-import { getHotelByID } from "../../Service/HotelService";
-import { getRoomById } from "../../Service/RoomService";
+import { getUserById } from "../../Service/UserServices";
 
 const { Title, Text } = Typography;
 
@@ -19,71 +16,69 @@ export default function Profile() {
     const fullName = localStorage.getItem("fullName") || "Chưa có tên";
     const email = localStorage.getItem("email") || "Chưa có email";
     const phone = localStorage.getItem("phone") || "Chưa có số điện thoại";
+    const userId = localStorage.getItem("userId")?.trim();
 
     const navigate = useNavigate();
-    const [user, setUser] = useState();
-
-    const getHotelNameById = async (id) => {
-        const response = await getHotelByID(id);
-        return(response?.hotelList[0]?.name)        
-    }
-
-    const getRoomNameById = async (id) => {
-        const response = await getRoomById(id);
-        return(response?.roomList[0]?.name)
-    }
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const fetchAPI = async () => {
-            const response = await getUserById(localStorage.getItem("userId"));
-            const data = response.user;
-            setUser(data);
-        } 
-        fetchAPI();
-    },[]);
+        const fetchUser = async () => {
+            try {
+                const res = await getUserById(userId);
+                const userData = res.user;
 
-    const dataSource = user?.bookings;
+                const enrichedBookings = (userData.bookings || []).map(b => ({
+                    ...b,
+                    key: b.id,
+                }));
 
-    // Cột của bảng
+                setUser({
+                    ...userData,
+                    bookings: enrichedBookings,
+                });
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu người dùng:", error);
+            }
+        };
+
+        if (userId) {
+            fetchUser();
+        }
+    }, [userId]);
+
     const columns = [
         {
-        title: 'Khách sạn',
-        dataIndex: 'hotel_id',
-        key: 'hotel_id',
-        render: (hotel_id) => (
-            <div>{getHotelNameById(hotel_id)}</div>
-        ),
-    },
-    {
-        title: 'Loại phòng',
-        dataIndex: 'room_type_id',
-        key: 'room_type_id',
-        render: (room_type_id) => (
-            <div>{getRoomNameById(room_type_id)}</div>
-        )
-    },
-    {
-        title: 'Ngày nhận phòng',
-        dataIndex: 'check_in_date',
-        key: 'check_in_date',
-    },
-    {
-        title: 'Ngày trả phòng',
-        dataIndex: 'check_out_date',
-        key: 'check_out_date',
-    },
-    {
-        title: 'Trạng thái',
-        dataIndex: 'status',
-        key: 'status',
-        render: (status) => (
-            <Tag color={status === "PAID" || status === "Đã thanh toán" ? "green" : "volcano"}>
-                {status}
-            </Tag>
-        ),
-    },
-    
-];
+            title: "Loại phòng",
+            dataIndex: "room",
+            key: "roomName",
+            render: (room) => <div>{room?.name || "Không rõ"}</div>,
+        },
+        {
+            title: "Ngày nhận phòng",
+            dataIndex: "checkInDate",
+            key: "checkInDate",
+        },
+        {
+            title: "Ngày trả phòng",
+            dataIndex: "checkOutDate",
+            key: "checkOutDate",
+        },
+        {
+            title: "Trạng thái",
+            dataIndex: "status",
+            key: "status",
+            render: (status) => {
+                let color = "default";
+                const lower = status?.toLowerCase();
+
+                if (lower === "confirmed") color = "green";
+                else if (lower === "pending") color = "orange";
+                else if (lower === "canceled") color = "red";
+
+                return <Tag color={color}>{status}</Tag>;
+            },
+        },
+    ];
 
     return (
         <div className="profile-container">
@@ -104,16 +99,20 @@ export default function Profile() {
                     <div className="profile-info">
                         <Title level={3}>{fullName}</Title>
                         <Space direction="vertical" size="small">
-                            <Text><MailOutlined /> {email}</Text>
-                            <Text><PhoneOutlined /> {phone}</Text>
+                            <Text>
+                                <MailOutlined /> {email}
+                            </Text>
+                            <Text>
+                                <PhoneOutlined /> {phone}
+                            </Text>
                         </Space>
                     </div>
                 </div>
 
                 <div className="profile-extra">
-                    <h2 style={{marginBottom: "20px"}}>Danh sách phòng đã đặt :</h2>
+                    <h2 style={{ marginBottom: "20px" }}>Danh sách phòng đã đặt:</h2>
                     <Table
-                        dataSource={dataSource}
+                        dataSource={user?.bookings || []}
                         columns={columns}
                         pagination={false}
                         rowKey="key"

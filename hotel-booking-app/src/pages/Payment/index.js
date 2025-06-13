@@ -5,6 +5,7 @@ import { format, isValid } from 'date-fns';
 import { getHotelByID } from '../../Service/HotelService';
 import './Payment.scss';
 import { bookRoom } from '../../Service/BookRoomService';
+import { QRcode } from './QRcode';
 
 
 const { Text } = Typography;
@@ -26,6 +27,8 @@ function Payment() {
     const checkInDate = bookingData?.checkInDate;
     const checkOutDate = bookingData?.checkOutDate;
     const currency = 'VND';
+
+    const price = hotel && hotel.roomTypes ? hotel.roomTypes.find(r => r.id === roomTypeId)?.price || 'Không xác định' : 'Đang tải...';
 
     const formattedDate =
         checkInDate && checkOutDate &&
@@ -116,7 +119,7 @@ function Payment() {
                             <br />
                             <br />
                             <Text>Giá: </Text>
-                            <Text strong>{hotel && hotel.roomTypes ? hotel.roomTypes.find(r => r.id === roomTypeId)?.price || 'Không xác định' : 'Đang tải...'} {currency}</Text>
+                            <Text strong>{price.toLocaleString("vi-VN")} {currency}</Text>
                         </Card>
                         <br />
                         <Card className="info-card" title="Thời gian">
@@ -162,9 +165,9 @@ function Payment() {
                                 </Form.Item>
                             </Form>
                         </Card>
-                        <div>
-                            <Outlet />
-                        </div>
+                        <Card style={{marginTop : "30px"}}>
+                            <QRcode price={price}/>
+                        </Card>
                     </Col>
                     <Col className='submit'>
                         {error && (
@@ -195,7 +198,7 @@ function Payment() {
                                 loading={isLoading}
                                 disabled={isLoading || !agreePolicy}
                             >
-                                {isLoading ? 'Đang xử lý...' : 'Thanh Toán Ngay'}
+                                {isLoading ? 'Đang xử lý...' : 'Đã thanh toán!!!'}
                             </Button>
                         
                     </Col>

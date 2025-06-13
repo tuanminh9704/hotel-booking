@@ -60,7 +60,7 @@ function GridHotel(props) {
                       <h2 className="title">{item.name}</h2>
                       <div className="address">{item.address}</div>
                       <a href={item.linkMap} className="link-map" target="_blank" rel="noreferrer">Xem bản đồ</a>
-                      <p className="description">{item.description}</p>
+                      {/* <p className="description">{item.description}</p> */}
                       <div className="cancel">
                         {item.cancel ? (
                           <>

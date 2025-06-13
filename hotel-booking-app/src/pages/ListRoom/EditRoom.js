@@ -72,7 +72,7 @@ function EditRoom(props) {
             );
 
             const response = await editRoom(record.id, updatedRoomData);
-            if (true || response.statusCode == 200) {
+            if (response.statusCode == 200) {
                 // Chuẩn bị dữ liệu tiện ích để gửi
                 const amenitiesData = values.amenities.map((amenityId) => ({
                     name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
@@ -90,7 +90,7 @@ function EditRoom(props) {
                             }
                         } catch (error) {
                             console.error(`Lỗi khi cập nhật tiện ích ${amenity.name}:`, error);
-                            messageApi.open({ type: "error", content: `Lỗi khi cập nhật tiện ích ${amenity.name}` });
+                            // messageApi.open({ type: "error", content: `Lỗi khi cập nhật tiện ích ${amenity.name}` });
                         }
                     })
                 );

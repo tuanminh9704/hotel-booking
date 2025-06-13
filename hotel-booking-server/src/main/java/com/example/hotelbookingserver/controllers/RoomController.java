@@ -106,17 +106,19 @@ public class RoomController {
 
     @PutMapping("/update/{roomId}")
     // @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Response> updateRoom(@PathVariable UUID roomId,
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "quantityBed", required = false) Integer quantityBed,
-            @RequestParam(value = "quantityPeople", required = false) Integer quantityPeople,
-            @RequestParam(value = "roomArea", required = false) Integer roomArea,
-            @RequestParam(value = "price", required = false) BigDecimal price,
-            @RequestParam(value = "quantityRoom", required = false) Integer quantityRoom
+    public ResponseEntity<Response> updateRoom(
+            @PathVariable UUID roomId,
+            @RequestBody RoomTypeDTO roomTypeDTO) {
 
-    ) {
-        Response response = roomService.updateRoom(roomId, name, quantityBed, quantityPeople, roomArea, price,
-                quantityRoom);
+        Response response = roomService.updateRoom(
+                roomId,
+                roomTypeDTO.getName(),
+                roomTypeDTO.getQuantityBed(),
+                roomTypeDTO.getQuantityPeople(),
+                roomTypeDTO.getRoomArea(),
+                roomTypeDTO.getPrice(),
+                roomTypeDTO.getQuantityRoom());
+
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
