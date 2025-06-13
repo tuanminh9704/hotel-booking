@@ -17,8 +17,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "images")
 public class Image {
     @Id
@@ -31,6 +33,10 @@ public class Image {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = true)
     private Hotel hotel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_type_id", nullable = true)
+    private RoomType roomType;
 
     @Column(name = "image_url")
     private String imageUrl;

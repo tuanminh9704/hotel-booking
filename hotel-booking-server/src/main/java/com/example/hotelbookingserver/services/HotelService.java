@@ -20,7 +20,10 @@ import com.example.hotelbookingserver.dtos.AmenityDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,6 +44,9 @@ public class HotelService implements IHotelService {
 
         @Autowired
         private ReviewsRepository reviewsRepository;
+
+        @Autowired
+        private ImageService imageService;
 
         @Override
         public Response getAllHotels() {
@@ -91,7 +97,6 @@ public class HotelService implements IHotelService {
                 try {
                         Hotel hotel = new Hotel();
                         hotel.setName(requestDTO.getName());
-                        hotel.setThumbnail(requestDTO.getThumbnail());
                         hotel.setAddress(requestDTO.getAddress());
                         hotel.setLinkMap(requestDTO.getLinkMap());
                         hotel.setDescription(requestDTO.getDescription());
@@ -99,14 +104,33 @@ public class HotelService implements IHotelService {
                         hotel.setCheckInTime(requestDTO.getCheckInTime());
                         hotel.setCheckOutTime(requestDTO.getCheckOutTime());
 
+                        String thumbnailUrl = requestDTO.getThumbnail();
+                        if ((thumbnailUrl == null || thumbnailUrl.isEmpty())
+                                        && requestDTO.getImages() != null
+                                        && !requestDTO.getImages().isEmpty()) {
+
+                                MultipartFile thumbnailFile = requestDTO.getImages().get(0).getFile();
+                                if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+                                        Map uploadResult = imageService.uploadImage(thumbnailFile);
+                                        thumbnailUrl = uploadResult.get("secure_url").toString();
+                                }
+                        }
+                        hotel.setThumbnail(thumbnailUrl);
+
                         Hotel savedHotel = hotelRepository.save(hotel);
 
                         if (requestDTO.getImages() != null) {
                                 for (ImageDTO imgDTO : requestDTO.getImages()) {
-                                        Image image = new Image();
-                                        image.setImageUrl(imgDTO.getImageUrl());
-                                        image.setHotel(savedHotel);
-                                        imageRepository.save(image);
+                                        MultipartFile file = imgDTO.getFile();
+                                        if (file != null && !file.isEmpty()) {
+                                                Map uploadResult = imageService.uploadImage(file);
+                                                String imageUrl = uploadResult.get("secure_url").toString();
+
+                                                Image image = new Image();
+                                                image.setImageUrl(imageUrl);
+                                                image.setHotel(savedHotel); // Gán hotel cho ảnh
+                                                imageRepository.save(image);
+                                        }
                                 }
                         }
 
@@ -120,6 +144,7 @@ public class HotelService implements IHotelService {
                                         roomType.setQuantityRoom(rtDTO.getQuantityRoom());
                                         roomType.setPrice(rtDTO.getPrice());
                                         roomType.setHotel(savedHotel);
+
                                         RoomType savedRoomType = roomTypeRepository.save(roomType);
 
                                         if (rtDTO.getAmenities() != null) {
@@ -146,9 +171,10 @@ public class HotelService implements IHotelService {
                         response.setStatusCode(201);
                         response.setMessage("Add full hotel successfully");
                         response.setHotelList(List.of(Utils.mapHotelEntityToHotelDTO(savedHotel)));
+
                 } catch (Exception e) {
                         response.setStatusCode(500);
-                        response.setMessage("Error adding hotel" + e.getMessage());
+                        response.setMessage("Error adding hotel: " + e.getMessage());
                 }
 
                 return response;
