@@ -2,7 +2,8 @@ import { Button, Col, Form, Input, InputNumber, message, Modal, Row, Select } fr
 import { EditOutlined } from '@ant-design/icons';
 import { useState } from "react";
 import { getHotelByID } from "../../Service/HotelService";
-import { editHotel, editRoom } from "../../Service/RoomService";
+import { editRoom, createAmenities } from "../../Service/RoomService"; // Thêm createAmenities
+import { editAmenities } from "../../Service/Amenities";
 
 const { Option } = Select;
 
@@ -13,7 +14,6 @@ function EditRoom(props) {
     const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
 
-    // Danh sách tiện ích mẫu (đồng bộ với CreateRoom.jsx)
     const availableAmenities = [
         { id: 'amenity1', name: 'Ban công' },
         { id: 'amenity2', name: 'View biển' },
@@ -32,23 +32,10 @@ function EditRoom(props) {
         { id: 'amenity15', name: 'Rèm cản sáng' },
     ];
 
-    const rules = [
-        {
-            required: true,
-            message: 'Không được bỏ trống!',
-        },
-    ];
-
+    const rules = [{ required: true, message: 'Không được bỏ trống!' }];
     const priceRules = [
-        {
-            required: true,
-            message: 'Không được bỏ trống!',
-        },
-        {
-            type: 'number',
-            min: 1,
-            message: 'Giá phải lớn hơn 0 VND!',
-        },
+        { required: true, message: 'Không được bỏ trống!' },
+        { type: 'number', min: 1, message: 'Giá phải lớn hơn 0 VND!' },
     ];
 
     const handleCancel = () => {
@@ -62,10 +49,7 @@ function EditRoom(props) {
 
     const handleSubmit = async (values) => {
         if (values.price <= 0) {
-            messageApi.open({
-                type: "error",
-                content: "Giá phải lớn hơn 0 VND!",
-            });
+            messageApi.open({ type: "error", content: "Giá phải lớn hơn 0 VND!" });
             return;
         }
 
@@ -76,43 +60,50 @@ function EditRoom(props) {
             roomArea: values.roomArea,
             price: values.price,
             quantityRoom: values.availableRooms,
-            // amenities: values.amenities?.map((amenityId) => ({
-            //     id: `amenity-${Date.now()}-${amenityId}`,
-            //     name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
-            //     roomTypeId: record.id,
-            // })) || [],
-            // hotelId: record.hotelId,
+            hotelId: record.hotelId, // Đảm bảo hotelId được giữ nguyên
         };
 
         try {
-            // Lấy dữ liệu khách sạn hiện tại
             const hotelResponse = await getHotelByID(record.hotelId);
             const hotelData = hotelResponse.hotelList[0] || hotelResponse;
 
-            // Cập nhật mảng roomTypes: thay thế phòng cũ bằng phòng đã chỉnh sửa
             const updatedRoomTypes = hotelData.roomTypes.map((room) =>
                 room.id === record.id ? updatedRoomData : room
             );
 
-            // Gọi API để cập nhật khách sạn
-            console.log(updatedRoomData);
-            const response = await editRoom(record.id,updatedRoomData );
-            if (response) {
+            const response = await editRoom(record.id, updatedRoomData);
+            if (response.statusCode == 200) {
+                // Chuẩn bị dữ liệu tiện ích để gửi
+                const amenitiesData = values.amenities.map((amenityId) => ({
+                    name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
+                    roomTypeId: record.id, // Sử dụng id phòng hiện tại làm roomTypeId
+                    // hotelId: record.hotelId, // Thêm hotelId
+                }));
+
+                // Gửi danh sách tiện ích đến server
+                await Promise.all(
+                    amenitiesData.map(async (amenity) => {
+                        try {
+                            const amenityResponse = await editAmenities(amenity);
+                            if (amenityResponse.statusCode !== 200) {
+                                console.warn(`Cập nhật tiện ích ${amenity.name} thất bại: ${amenityResponse.message}`);
+                            }
+                        } catch (error) {
+                            console.error(`Lỗi khi cập nhật tiện ích ${amenity.name}:`, error);
+                            messageApi.open({ type: "error", content: `Lỗi khi cập nhật tiện ích ${amenity.name}` });
+                        }
+                    })
+                );
+
                 setIsShowModal(false);
-                messageApi.open({
-                    type: "success",
-                    content: "Sửa đổi thành công",
-                });
+                messageApi.open({ type: "success", content: "Sửa đổi thành công" });
                 reLoad();
             } else {
                 throw new Error(response?.message || "Sửa đổi thất bại");
             }
         } catch (error) {
             setIsShowModal(false);
-            messageApi.open({
-                type: "error",
-                content: error.message || "Sửa đổi thất bại",
-            });
+            messageApi.open({ type: "error", content: error.message || "Sửa đổi thất bại" });
         }
     };
 
@@ -134,7 +125,7 @@ function EditRoom(props) {
                         roomArea: record?.roomArea,
                         price: record?.price,
                         availableRooms: record?.quantityRoom,
-                        amenities: record?.amenities?.map(a => a.id) || [],
+                        amenities: record?.amenities?.map((a) => a.id) || [], // Đồng bộ với Select
                     }}
                 >
                     <Row gutter={[20, 20]}>
@@ -177,7 +168,7 @@ function EditRoom(props) {
                             <Form.Item label="Tiện ích" name="amenities" rules={rules}>
                                 <Select mode="multiple" placeholder="Chọn tiện ích" allowClear>
                                     {availableAmenities.map((amenity) => (
-                                        <Option key={amenity.id} value={amenity.name}>
+                                        <Option key={amenity.id} value={amenity.id}>
                                             {amenity.name}
                                         </Option>
                                     ))}

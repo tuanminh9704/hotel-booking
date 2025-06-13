@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Typography, Row, Col, Form, Input, Checkbox, Alert } from 'antd';
 import { format, isValid } from 'date-fns';
 import { getHotelByID } from '../../Service/HotelService';
@@ -36,14 +36,6 @@ function Payment() {
 
 
     const handlePayment = async (values) => {
-
-        const fetchAPI = async (roomId, userId, option) => {
-            const response = await bookRoom(roomId, userId, option);
-            if (response.statusCode == 200) {
-                alert("đặt phòng thành công")
-            }
-        }
-
         if (!agreePolicy) {
             setError('Vui lòng đồng ý với các điều khoản và chính sách.');
             return;
@@ -51,17 +43,30 @@ function Payment() {
 
         setError('');
         setIsLoading(true);
+
         try {
-            console.log('Thông tin thanh toán:', { ...bookingData, ...values, user_id: userId, status: "pending" });
-            fetchAPI(roomTypeId, userId, { ...bookingData, ...values, user_id: userId , status: "pending"});
-            navigate('/', { state: { bookingData, guestInfo: values } });
+            const payload = {
+                ...bookingData,
+                ...values,
+                user_id: userId,
+                status: 'pending',
+            };
+
+            const response = await bookRoom(roomTypeId, userId, payload); // ✅ Sửa: await
+
+            if (response.statusCode === 200) {
+                navigate('code', { state: { bookingData, guestInfo: values } });// ✅ Điều hướng sau khi thành công
+            } else {
+                throw new Error(response.message || 'Đặt phòng thất bại.');
+            }
         } catch (error) {
-            setError('Thanh toán thất bại. Vui lòng thử lại.');
+            setError(error.message || 'Thanh toán thất bại. Vui lòng thử lại.');
             console.error('Lỗi thanh toán:', error);
         } finally {
             setIsLoading(false);
         }
     };
+
 
     useEffect(() => {
         const fetchAPI = async () => {
@@ -144,7 +149,7 @@ function Payment() {
                                         { type: 'email', message: 'Email không hợp lệ' },
                                     ]}
                                 >
-                                    <Input placeholder="Nhập email" size="large" defaultValue={localStorage.getItem("email")}/>
+                                    <Input placeholder="Nhập email" size="large" defaultValue={localStorage.getItem("email")} />
                                 </Form.Item>
                                 <Form.Item
                                     label="Số điện thoại"
@@ -153,10 +158,13 @@ function Payment() {
                                         { pattern: /^[0-9]{10,12}$/, message: 'Số điện thoại không hợp lệ' },
                                     ]}
                                 >
-                                    <Input placeholder="Nhập số điện thoại" size="large" defaultValue={localStorage.getItem("phone")}/>
+                                    <Input placeholder="Nhập số điện thoại" size="large" defaultValue={localStorage.getItem("phone")} />
                                 </Form.Item>
                             </Form>
                         </Card>
+                        <div>
+                            <Outlet />
+                        </div>
                     </Col>
                     <Col className='submit'>
                         {error && (
@@ -179,15 +187,17 @@ function Payment() {
                             </Checkbox>
                         </Card>
                         <br />
-                        <Button
-                            type='primary'
-                            size="large"
-                            onClick={() => form.submit()}
-                            loading={isLoading}
-                            disabled={isLoading || !agreePolicy}
-                        >
-                            {isLoading ? 'Đang xử lý...' : 'Thanh Toán Ngay'}
-                        </Button>
+                       
+                            <Button
+                                type='primary'
+                                size="large"
+                                onClick={() => form.submit()}
+                                loading={isLoading}
+                                disabled={isLoading || !agreePolicy}
+                            >
+                                {isLoading ? 'Đang xử lý...' : 'Thanh Toán Ngay'}
+                            </Button>
+                        
                     </Col>
                 </Row>
             </main>

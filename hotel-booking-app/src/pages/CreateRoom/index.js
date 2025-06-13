@@ -1,10 +1,11 @@
 import { Col, Form, Row, Input, Button, InputNumber, Select, Tabs, Upload, TimePicker, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import './CreateRoom.scss';
-import { createHotel, getHotelByID, getHotels } from '../../Service/HotelService';
-import { createRoom, editHotel } from '../../Service/RoomService';
+import { createHotel, getHotels } from '../../Service/HotelService';
+import { createRoom } from '../../Service/RoomService';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
+import { createAmenities } from '../../Service/Amenities';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -143,22 +144,47 @@ function CreateRoom() {
       roomArea: values.roomArea,
       price: values.price,
       quantityRoom: values.availableRooms,
-      // amenities: values.amenities.map((amenityId) => ({
-      //   // id: `amenity-${Date.now()}-${amenityId}`,
-      //   name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
-      //   roomTypeId: `${selectedHotel}-${Date.now()}`,
-      // })),
       hotelId: selectedHotel,
     };
 
     try {
       const response = await createRoom(roomData);
-      if (response.statusCode == 200) {
+      console.log(response);
+      if (response.statusCode === 200) {
         message.success('Thêm phòng thành công');
+
+        // Chuẩn bị dữ liệu tiện ích
+        const amenitiesData = values.amenities.map((amenityId) => ({
+          name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
+          roomTypeId: response.room.id, // Đảm bảo roomTypeId là duy nhất
+          // hotelId: selectedHotel,
+        }));
+
+        // Gửi danh sách tiện ích đến server
+        await Promise.all(
+          amenitiesData.map(async (amenity) => {
+            try {
+              const amenityResponse = await createAmenities(amenity);
+              if (amenityResponse.statusCode !== 200) {
+                console.warn(`Tạo tiện ích ${amenity.name} thất bại: ${amenityResponse.message}`);
+              }
+            } catch (error) {
+              console.error(`Lỗi khi tạo tiện ích ${amenity.name}:`, error);
+              message.error(`Lỗi khi tạo tiện ích ${amenity.name}`);
+            }
+          })
+        );
+
+        message.success('Thêm tiện ích thành công');
         formRoom.resetFields();
         // Làm mới danh sách khách sạn
         const updatedHotels = await getHotels();
-        setHotels((Array.isArray(updatedHotels) ? updatedHotels : updatedHotels.data || []).map(item => ({ id: item.id, name: item.name })));
+        setHotels(
+          (Array.isArray(updatedHotels) ? updatedHotels : updatedHotels.data || []).map((item) => ({
+            id: item.id,
+            name: item.name,
+          }))
+        );
       } else {
         message.error(`Thêm phòng thất bại: ${response.message || 'Lỗi không xác định'}`);
       }

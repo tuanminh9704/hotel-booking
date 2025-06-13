@@ -46,7 +46,6 @@ function Discover() {
       try {
         const response = await getHotels();
         setHotels(response.hotelList);
-        console.log(response);
         
       } catch (error) {
         console.error("Lỗi khi tải danh sách khách sạn:", error);

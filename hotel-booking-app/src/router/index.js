@@ -1,4 +1,3 @@
-import { elements } from 'chart.js';
 import LayoutDefault from '../layoutDefault/layoutDefault';
 // import BookRoom from "../pages/BookRoom";
 import CreateRoom from '../pages/CreateRoom';
@@ -12,6 +11,7 @@ import Payment from '../pages/Payment';
 import PrivateRouters from '../components/PrivateRouters';
 import Profile from '../pages/Profile';
 import { Account } from '../pages/Account';
+import { QRcode } from '../pages/Payment/QRcode';
 
 export const router = [
     {
@@ -20,7 +20,13 @@ export const router = [
     },
     {
         path: "payment",
-        element: <Payment />
+        element: <Payment />,
+        children: [
+            {
+                path: "code",
+                element: <QRcode/>
+            }
+        ]
     },
     {
         path: "discover",
@@ -82,6 +88,6 @@ export const router = [
     },
     {
         path: "/*",
-        elements: <><h1>Trang không tồn tại</h1></>,
+        element: <><h1>Trang không tồn tại</h1></>,
     }
 ];
