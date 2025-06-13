@@ -30,7 +30,10 @@ const DemoRadar = ({ data }) => {
         'Đà Nẵng': 0,
         'Thành phố Hồ Chí Minh': 0,
       };
-  
+      
+      console.log(bookings);
+      
+
       const hotels = await Promise.all(
         bookings.map((b) => getHotelByID(b.hotelId))
       );

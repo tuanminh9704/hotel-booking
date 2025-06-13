@@ -1,7 +1,7 @@
-import { post, get, del, patch } from "../utils/request";
+import { post, get, del, patch, put } from "../utils/request";
 
 export const createRoom = async (options) => {
-    return await post('rooms', options);
+    return await post('rooms/add', options);
 };
 
 export const getRoomById = async (id) => {
@@ -9,14 +9,14 @@ export const getRoomById = async (id) => {
 };
 
 export const deleteRoom = async (id) => {
-    return await del(`rooms/${id}`);
+    return await del(`rooms/delete/${id}`);
 };
 
-export const editRoom = async (hotelId, options) => {
-    return await patch(`hotels/${hotelId}`, options);
+export const editRoom = async (id, options) => {
+    return await put(`rooms/update/${id}`, options);
 };
 
 
 export const editHotel = async (id,options) => {
-    return await patch(`hotels/${id}`, options);
+    return await put(`hotels/${id}`, options);
 };

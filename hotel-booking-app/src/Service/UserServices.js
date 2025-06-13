@@ -17,8 +17,8 @@ export const getAllUser = async () => {
     return await get(`users/all`);
 }
 
-export const deleteRoom = async (id) => {
-    return await del(`rooms/${id}`);
+export const getUserById = async (id) => {
+    return await get(`users/get-by-id/${id}`);
 }
 
 export const editRoom = async (id, options) => {

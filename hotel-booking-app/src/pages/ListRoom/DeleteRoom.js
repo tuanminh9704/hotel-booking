@@ -1,7 +1,7 @@
 import { Button, Popconfirm, message } from "antd";
 import { DeleteOutlined } from '@ant-design/icons';
 import { getHotelByID } from "../../Service/HotelService";
-import { editHotel } from "../../Service/RoomService";
+import { deleteRoom, editHotel } from "../../Service/RoomService";
 
 function DeleteRoom(props) {
     const { idRoom, hotelId, reLoad } = props;
@@ -15,11 +15,11 @@ function DeleteRoom(props) {
             const hotelData = hotelResponse.data || hotelResponse;
 
             // Lọc bỏ phòng có idRoom khỏi mảng roomTypes
-            const updatedRoomTypes = hotelData.roomTypes.filter((room) => room.id !== idRoom);
+            // const updatedRoomTypes = hotelData.roomTypes.filter((room) => room.id !== idRoom);
 
             // Cập nhật khách sạn với roomTypes mới
-            const response = await editHotel(hotelId, { roomTypes: updatedRoomTypes });
-            if (response) {
+            const response = await deleteRoom(idRoom);
+            if (response.statusCode == 200) {
                 messageApi.open({
                     type: "success",
                     content: "Xóa phòng thành công",

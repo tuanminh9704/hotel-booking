@@ -20,11 +20,11 @@ function Payment() {
 
     const bookingData = location.state?.bookingData;
 
-    const hotelId = bookingData?.hotel_id?.trim();
-    const roomTypeId = bookingData?.room_type_id?.trim();
+    const hotelId = bookingData?.hotelId?.trim();
+    const roomTypeId = bookingData?.roomId?.trim();
     const userId = localStorage.getItem("userId");
-    const checkInDate = bookingData?.check_in_date;
-    const checkOutDate = bookingData?.check_out_date;
+    const checkInDate = bookingData?.checkInDate;
+    const checkOutDate = bookingData?.checkOutDate;
     const currency = 'VND';
 
     const formattedDate =
@@ -37,9 +37,9 @@ function Payment() {
 
     const handlePayment = async (values) => {
 
-        const fetchAPI = async (option) => {
-            const response = await bookRoom(option);
-            if (response) {
+        const fetchAPI = async (roomId, userId, option) => {
+            const response = await bookRoom(roomId, userId, option);
+            if (response.statusCode == 200) {
                 alert("đặt phòng thành công")
             }
         }
@@ -52,8 +52,8 @@ function Payment() {
         setError('');
         setIsLoading(true);
         try {
-            console.log('Thông tin thanh toán:', { ...bookingData, ...values });
-            fetchAPI({ ...bookingData, ...values, user_id: userId });
+            console.log('Thông tin thanh toán:', { ...bookingData, ...values, user_id: userId, status: "pending" });
+            fetchAPI(roomTypeId, userId, { ...bookingData, ...values, user_id: userId , status: "pending"});
             navigate('/', { state: { bookingData, guestInfo: values } });
         } catch (error) {
             setError('Thanh toán thất bại. Vui lòng thử lại.');
@@ -133,30 +133,27 @@ function Payment() {
                             >
                                 <Form.Item
                                     label="Họ và tên"
-                                    name="fullName"
-                                    rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
+                                    rules={[{ required: false, message: 'Vui lòng nhập họ và tên' }]}
                                 >
-                                    <Input placeholder="Nhập họ và tên" size="large" />
+                                    <Input placeholder="Nhập họ và tên" size="large" defaultValue={localStorage.getItem("fullName")} />
                                 </Form.Item>
                                 <Form.Item
                                     label="Email"
-                                    name="email"
                                     rules={[
-                                        { required: true, message: 'Vui lòng nhập email' },
+                                        { required: false, message: 'Vui lòng nhập email' },
                                         { type: 'email', message: 'Email không hợp lệ' },
                                     ]}
                                 >
-                                    <Input placeholder="Nhập email" size="large" />
+                                    <Input placeholder="Nhập email" size="large" defaultValue={localStorage.getItem("email")}/>
                                 </Form.Item>
                                 <Form.Item
                                     label="Số điện thoại"
-                                    name="phone"
                                     rules={[
-                                        { required: true, message: 'Vui lòng nhập số điện thoại' },
+                                        { required: false, message: 'Vui lòng nhập số điện thoại' },
                                         { pattern: /^[0-9]{10,12}$/, message: 'Số điện thoại không hợp lệ' },
                                     ]}
                                 >
-                                    <Input placeholder="Nhập số điện thoại" size="large" />
+                                    <Input placeholder="Nhập số điện thoại" size="large" defaultValue={localStorage.getItem("phone")}/>
                                 </Form.Item>
                             </Form>
                         </Card>

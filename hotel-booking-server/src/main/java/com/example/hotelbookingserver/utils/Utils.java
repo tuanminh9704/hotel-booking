@@ -81,7 +81,7 @@ public class Utils {
         return roomTypeDTO;
     }
 
-    public static BookingDTO mapBookingEntityToBookingDTOPlusBookedRooms(Booking booking, boolean mapUser) {
+    public static BookingDTO mapBookingEntityToBookingDTOPlusBookedRooms(Booking booking) {
 
         BookingDTO bookingDTO = new BookingDTO();
 
@@ -89,9 +89,7 @@ public class Utils {
         bookingDTO.setCheckInDate(booking.getCheckInDate());
         bookingDTO.setCheckOutDate(booking.getCheckOutDate());
         bookingDTO.setStatus(booking.getStatus());
-        if (mapUser) {
-            bookingDTO.setUser(Utils.mapUserEntityToUserDTO(booking.getUser()));
-        }
+       
         if (booking.getRoomType() != null) {
             RoomType room = booking.getRoomType();
             RoomTypeDTO roomDTO = new RoomTypeDTO();
@@ -130,7 +128,7 @@ public class Utils {
         if (user.getBookings() != null && !user.getBookings().isEmpty()) {
             userDTO.setBookings(
                     user.getBookings().stream()
-                            .map((Booking booking) -> mapBookingEntityToBookingDTOPlusBookedRooms(booking, false))
+                            .map((Booking booking) -> mapBookingEntityToBookingDTOPlusBookedRooms(booking))
                             .collect(Collectors.toList()));
         }
         return userDTO;

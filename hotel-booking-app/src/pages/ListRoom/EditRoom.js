@@ -2,7 +2,7 @@ import { Button, Col, Form, Input, InputNumber, message, Modal, Row, Select } fr
 import { EditOutlined } from '@ant-design/icons';
 import { useState } from "react";
 import { getHotelByID } from "../../Service/HotelService";
-import { editHotel } from "../../Service/RoomService";
+import { editHotel, editRoom } from "../../Service/RoomService";
 
 const { Option } = Select;
 
@@ -70,25 +70,24 @@ function EditRoom(props) {
         }
 
         const updatedRoomData = {
-            id: record.id,
             name: values.name,
             quantityBed: values.quantityBed,
             quantityPeople: values.quantityPeople,
             roomArea: values.roomArea,
             price: values.price,
-            availableRooms: values.availableRooms,
-            amenities: values.amenities?.map((amenityId) => ({
-                id: `amenity-${Date.now()}-${amenityId}`,
-                name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
-                roomTypeId: record.id,
-            })) || [],
-            hotelId: record.hotelId,
+            quantityRoom: values.availableRooms,
+            // amenities: values.amenities?.map((amenityId) => ({
+            //     id: `amenity-${Date.now()}-${amenityId}`,
+            //     name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
+            //     roomTypeId: record.id,
+            // })) || [],
+            // hotelId: record.hotelId,
         };
 
         try {
             // Lấy dữ liệu khách sạn hiện tại
             const hotelResponse = await getHotelByID(record.hotelId);
-            const hotelData = hotelResponse.data || hotelResponse;
+            const hotelData = hotelResponse.hotelList[0] || hotelResponse;
 
             // Cập nhật mảng roomTypes: thay thế phòng cũ bằng phòng đã chỉnh sửa
             const updatedRoomTypes = hotelData.roomTypes.map((room) =>
@@ -96,7 +95,8 @@ function EditRoom(props) {
             );
 
             // Gọi API để cập nhật khách sạn
-            const response = await editHotel(record.hotelId, { roomTypes: updatedRoomTypes });
+            console.log(updatedRoomData);
+            const response = await editRoom(record.id,updatedRoomData );
             if (response) {
                 setIsShowModal(false);
                 messageApi.open({
@@ -133,7 +133,7 @@ function EditRoom(props) {
                         quantityPeople: record?.quantityPeople,
                         roomArea: record?.roomArea,
                         price: record?.price,
-                        availableRooms: record?.availableRooms,
+                        availableRooms: record?.quantityRoom,
                         amenities: record?.amenities?.map(a => a.id) || [],
                     }}
                 >

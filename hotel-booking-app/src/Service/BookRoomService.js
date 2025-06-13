@@ -1,5 +1,5 @@
 import { post } from '../utils/request'
 
-export const bookRoom =async (options)=> {
-    return await post('bookings',options);
+export const bookRoom =async (roomid, userid, options)=> {
+    return await post(`bookings/book-room/${roomid}/${userid}`,options);
 }

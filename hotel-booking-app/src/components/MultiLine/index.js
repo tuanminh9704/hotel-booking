@@ -26,7 +26,7 @@ function MultiLine({ data }) {
     const currentYear = new Date().getFullYear(); // 2025
 
     bookings.forEach((booking) => {
-      const checkInDate = booking.date[0]; // "dd/mm/yyyy"
+      const checkInDate = booking.checkInDate; // "dd/mm/yyyy"
       const [day, month, year] = checkInDate.split('/');
       if (parseInt(year) === currentYear) {
         const monthIndex = parseInt(month) - 1; // Chuyển sang 0-based (Jan = 0)

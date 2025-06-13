@@ -43,13 +43,13 @@ function Detail() {
 
     const handleFormSubmit = () => {
     if (time && selectedRoomTypeId) {
-        const [check_in_date, check_out_date] = time.map(date => date.format("DD/MM/YYYY"));
+        const [check_in_date, check_out_date] = time.map(date => date.format("YYYY-MM-DD"));
 
         const bookingData = {
-            hotel_id: param.id,
-            room_type_id: selectedRoomTypeId,
-            check_in_date: check_in_date,
-            check_out_date: check_out_date,
+            hotelId: param.id,
+            roomId: selectedRoomTypeId,
+            checkInDate: check_in_date,
+            checkOutDate: check_out_date,
         };
 
         navigate("/payment", { state: { bookingData } });
@@ -83,12 +83,7 @@ function Detail() {
             key: 'roomArea',
             render: (roomArea) => roomArea !== undefined ? `${roomArea} m²` : "Chưa xác định",
         },
-        {
-            title: 'Phòng trống',
-            dataIndex: 'availableRooms',
-            key: 'availableRooms',
-            render: (availableRooms) => availableRooms !== undefined ? availableRooms : "Chưa xác định",
-        },
+        
         {
             title: 'Các tiện nghi',
             dataIndex: 'amenities',
@@ -118,10 +113,10 @@ function Detail() {
             dataIndex: 'id',
             key: 'action',
             render: (id, record) => (
-                <Tooltip title={(!time && "Hãy chọn ngày đặt trước!") || (record.availableRooms === 0 && "Hết phòng trống!" || localStorage.getItem("userId") && "Vui lòng đăng nhập trước!")}>
+                <Tooltip title={(!time && "Hãy chọn ngày đặt trước!") || ( !localStorage.getItem("userId") && "Vui lòng đăng nhập trước!")}>
                     <Button
                         type="primary"
-                        disabled={!time || record.availableRooms === 0 || localStorage.getItem("userId")}
+                        disabled={!time || !localStorage.getItem("userId")}
                         onClick={() => handleBookRoom(id)}
                     >
                         Đặt ngay

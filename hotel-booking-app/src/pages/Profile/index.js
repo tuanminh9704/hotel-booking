@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import "./Profile.scss";
-import { getAllUser } from "../../Service/UserServices";
+import { getAllUser, getUserById } from "../../Service/UserServices";
 import { getHotelByID } from "../../Service/HotelService";
 import { getRoomById } from "../../Service/RoomService";
 
@@ -35,8 +35,8 @@ export default function Profile() {
 
     useEffect(() => {
         const fetchAPI = async () => {
-            const response = await getAllUser();
-            const data = response.userList.find(item => item.email == email)
+            const response = await getUserById(localStorage.getItem("userId"));
+            const data = response.user;
             setUser(data);
         } 
         fetchAPI();

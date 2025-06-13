@@ -2,7 +2,7 @@ import { Col, Form, Row, Input, Button, InputNumber, Select, Tabs, Upload, TimeP
 import { UploadOutlined } from '@ant-design/icons';
 import './CreateRoom.scss';
 import { createHotel, getHotelByID, getHotels } from '../../Service/HotelService';
-import { editHotel } from '../../Service/RoomService';
+import { createRoom, editHotel } from '../../Service/RoomService';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 
@@ -99,7 +99,6 @@ function CreateRoom() {
   const handleCreateHotel = async (values) => {
     setIsLoadingHotel(true);
     const hotelData = {
-      id: `hotel-${Date.now()}`,
       name: values.name,
       thumbnail: values.thumbnail?.[0]?.response?.url || '',
       address: values.address,
@@ -110,7 +109,6 @@ function CreateRoom() {
       checkOutTime: values.checkOutTime ? dayjs(values.checkOutTime).format('HH:mm') : '',
       service: values.service || [],
       images: values.images?.map((file) => file.response?.url || file.url) || [],
-      roomTypes: [],
     };
 
     try {
@@ -139,32 +137,23 @@ function CreateRoom() {
 
     setIsLoadingRoom(true);
     const roomData = {
-      id: `${selectedHotel}-${Date.now()}`,
       name: values.name,
       quantityBed: values.quantityBed,
       quantityPeople: values.quantityPeople,
       roomArea: values.roomArea,
       price: values.price,
-      availableRooms: values.availableRooms,
-      amenities: values.amenities.map((amenityId) => ({
-        id: `amenity-${Date.now()}-${amenityId}`,
-        name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
-        roomTypeId: `${selectedHotel}-${Date.now()}`,
-      })),
+      quantityRoom: values.availableRooms,
+      // amenities: values.amenities.map((amenityId) => ({
+      //   // id: `amenity-${Date.now()}-${amenityId}`,
+      //   name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
+      //   roomTypeId: `${selectedHotel}-${Date.now()}`,
+      // })),
       hotelId: selectedHotel,
     };
 
     try {
-      // Lấy dữ liệu khách sạn hiện tại
-      const hotelResponse = await getHotelByID(selectedHotel);
-      const hotelData = hotelResponse.data || hotelResponse;
-      
-      // Thêm roomData vào mảng roomTypes hiện tại
-      const updatedRoomTypes = [...(hotelData.roomTypes || []), roomData];
-      
-      // Cập nhật khách sạn với roomTypes mới
-      const response = await editHotel(selectedHotel, { roomTypes: updatedRoomTypes });
-      if (response) {
+      const response = await createRoom(roomData);
+      if (response.statusCode == 200) {
         message.success('Thêm phòng thành công');
         formRoom.resetFields();
         // Làm mới danh sách khách sạn

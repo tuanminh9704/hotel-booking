@@ -62,3 +62,12 @@ export async function patch(url, data) {
     });
     return checkResponse(response);
 }
+
+export async function put(url, data) {
+    const response = await fetch(baseURL + url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    return checkResponse(response);
+}
