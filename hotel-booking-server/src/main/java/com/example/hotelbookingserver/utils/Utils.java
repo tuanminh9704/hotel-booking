@@ -73,6 +73,13 @@ public class Utils {
         roomTypeDTO.setPrice(roomType.getPrice());
         roomTypeDTO.setQuantityRoom(roomType.getQuantityRoom());
 
+        if (roomType.getImages() != null && !roomType.getImages().isEmpty()) {
+            roomTypeDTO.setImages(
+                    roomType.getImages().stream()
+                            .map(img -> new ImageDTO(img.getId(), img.getImageUrl()))
+                            .collect(Collectors.toList()));
+        }
+
         return roomTypeDTO;
     }
 
@@ -149,26 +156,37 @@ public class Utils {
         roomDTO.setRoomArea(room.getRoomArea());
         roomDTO.setQuantityRoom(room.getQuantityRoom());
         roomDTO.setPrice(room.getPrice());
+
         if (room.getHotel() != null) {
             roomDTO.setHotelId(room.getHotel().getId());
         }
 
         if (room.getBookings() != null) {
             roomDTO.setBookings(
-                    room.getBookings().stream().map(Utils::mapBookingEntityToBookingDTO).collect(Collectors.toList()));
+                    room.getBookings().stream()
+                            .map(Utils::mapBookingEntityToBookingDTO)
+                            .collect(Collectors.toList()));
         }
+
         if (room.getAmenities() != null && !room.getAmenities().isEmpty()) {
             roomDTO.setAmenities(
-                    room.getAmenities()
-                            .stream()
+                    room.getAmenities().stream()
                             .map(amenity -> {
                                 AmenityDTO dto = new AmenityDTO();
                                 dto.setId(amenity.getId());
                                 dto.setName(amenity.getName());
                                 return dto;
-                            })
+                            }).collect(Collectors.toList()));
+        }
+
+        // Ánh xạ ảnh
+        if (room.getImages() != null && !room.getImages().isEmpty()) {
+            roomDTO.setImages(
+                    room.getImages().stream()
+                            .map(img -> new ImageDTO(img.getId(), img.getImageUrl()))
                             .collect(Collectors.toList()));
         }
+
         return roomDTO;
     }
 

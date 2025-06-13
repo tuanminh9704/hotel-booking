@@ -1,6 +1,8 @@
 package com.example.hotelbookingserver.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 @Entity
+@Data
 @Table(name = "room_types")
 public class RoomType {
 
@@ -50,95 +53,11 @@ public class RoomType {
     @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "roomType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Image> images = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Hotel getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(Hotel hotel) {
-        this.hotel = hotel;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getQuantityBed() {
-        return quantityBed;
-    }
-
-    public void setQuantityBed(int quantityBed) {
-        this.quantityBed = quantityBed;
-    }
-
-    public int getQuantityPeople() {
-        return quantityPeople;
-    }
-
-    public void setQuantityPeople(int quantityPeople) {
-        this.quantityPeople = quantityPeople;
-    }
-
-    public int getRoomArea() {
-        return roomArea;
-    }
-
-    public void setRoomArea(int roomArea) {
-        this.roomArea = roomArea;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public List<Booking> getBookings() {
-        return bookings;
-    }
-
-    public void setBookings(List<Booking> bookings) {
-        this.bookings = bookings;
-    }
-
-    @Override
-    public String toString() {
-        return "RoomType [id=" + id + ", name=" + name + ", quantityBed=" + quantityBed + ", quantityPeople="
-                + quantityPeople + ", roomArea=" + roomArea + ", price=" + price + ", quantityRoom=" + quantityRoom
-                + ", amenities=" + amenities + ", bookings=" + bookings + ", hotel=" + hotel + "]";
-    }
-
-    public int getQuantityRoom() {
-        return quantityRoom;
-    }
-
-    public void setQuantityRoom(int quantityRoom) {
-        this.quantityRoom = quantityRoom;
-    }
-
-    public List<Amenity> getAmenities() {
-        return amenities;
-    }
-
-    public void setAmenities(List<Amenity> amenities) {
-        this.amenities = amenities;
-    }
 
 }
