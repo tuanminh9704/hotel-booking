@@ -17,6 +17,29 @@ function Detail() {
     const [selectedRoomTypeId, setSelectedRoomTypeId] = useState(null);
     const navigate = useNavigate();
 
+    const availableServices = [
+        'Xe đưa đón sân bay',
+        'Phòng gia đình',
+        'Phòng không hút thuốc',
+        'Chỗ đỗ xe miễn phí',
+        'Lễ tân 24 giờ',
+        'Sân thượng / hiên',
+        'Dịch vụ phòng',
+        'Thang máy',
+        'Giặt ủi',
+        'Spa & massage',
+        'Phòng gym',
+        'Hồ bơi ngoài trời',
+        'Cho thuê xe máy / ô tô',
+        'Dịch vụ giữ hành lý',
+        'Quầy tour du lịch',
+        'Bữa sáng tại phòng',
+        'Trợ giúp đặc biệt (concierge)',
+        'Dịch vụ trông trẻ',
+        'Wi-Fi miễn phí toàn khách sạn',
+        'Dọn phòng hàng ngày',
+    ];
+
     useEffect(() => {
         const fetchHotel = async () => {
             const response = await getHotelByID(param.id);
@@ -42,19 +65,19 @@ function Detail() {
     };
 
     const handleFormSubmit = () => {
-    if (time && selectedRoomTypeId) {
-        const [check_in_date, check_out_date] = time.map(date => date.format("YYYY-MM-DD"));
+        if (time && selectedRoomTypeId) {
+            const [check_in_date, check_out_date] = time.map(date => date.format("YYYY-MM-DD"));
 
-        const bookingData = {
-            hotelId: param.id,
-            roomId: selectedRoomTypeId,
-            checkInDate: check_in_date,
-            checkOutDate: check_out_date,
-        };
+            const bookingData = {
+                hotelId: param.id,
+                roomId: selectedRoomTypeId,
+                checkInDate: check_in_date,
+                checkOutDate: check_out_date,
+            };
 
-        navigate("/payment", { state: { bookingData } });
-    }
-};
+            navigate("/payment", { state: { bookingData } });
+        }
+    };
 
     const dataSource = data?.roomTypes ?? [];
 
@@ -83,7 +106,7 @@ function Detail() {
             key: 'roomArea',
             render: (roomArea) => roomArea !== undefined ? `${roomArea} m²` : "Chưa xác định",
         },
-        
+
         {
             title: 'Các tiện nghi',
             dataIndex: 'amenities',
@@ -113,7 +136,7 @@ function Detail() {
             dataIndex: 'id',
             key: 'action',
             render: (id, record) => (
-                <Tooltip title={(!time && "Hãy chọn ngày đặt trước!") || ( !localStorage.getItem("userId") && "Vui lòng đăng nhập trước!")}>
+                <Tooltip title={(!time && "Hãy chọn ngày đặt trước!") || (!localStorage.getItem("userId") && "Vui lòng đăng nhập trước!")}>
                     <Button
                         type="primary"
                         disabled={!time || !localStorage.getItem("userId")}
@@ -126,7 +149,7 @@ function Detail() {
         },
     ];
 
-    
+
 
     return (
         <>
@@ -199,8 +222,8 @@ function Detail() {
                                 <h3>Các tiện nghi được ưa chuộng nhất</h3>
                                 <div className="service">
                                     <Flex gap="4px 0" wrap>
-                                        {Array.isArray(data.service) && data.service.length > 0 ? (
-                                            data.service.map((item) => (
+                                        {Array.isArray(availableServices) && availableServices.length > 0 ? (
+                                            availableServices.map((item) => (
                                                 <Tag
                                                     key={item.id || item}
                                                     className="service__item"

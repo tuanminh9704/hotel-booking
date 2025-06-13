@@ -44,13 +44,20 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const fetchAPI = async () => {
+  const fetchAPI = async () => {
+    try {
       const response = await getHotels();
-      setData(response.hotelList);
-      setTotalHotels(response.length);
+      const list = response?.hotelList ?? []; // fallback nếu undefined
+      setData(list);
+      setTotalHotels(list.length);
+    } catch (error) {
+      console.error("Lỗi khi gọi API khách sạn:", error);
+      setData([]);
+      setTotalHotels(0);
     }
-    fetchAPI();
-  }, [])
+  };
+  fetchAPI();
+}, []);
 
 
 

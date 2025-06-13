@@ -101,7 +101,7 @@ function Grid() {
             <StatsCard title="Tổng đặt phòng" value={128} icon="📋" />
           </Col>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
-            <StatsCard title="Doanh thu" value={`${'49580000'.toLocaleString('vi-VN')} VND`} icon="💰" />
+            <StatsCard title="Doanh thu" value={`${(49380000).toLocaleString('vi-VN')}` + ' VND'} icon="💰" />
           </Col>
           <Col xxl={8} xl={8} lg={8} md={12} sm={24} xs={24}>
             <StatsCard title="Khách hàng mới" value={28} icon="👥" />

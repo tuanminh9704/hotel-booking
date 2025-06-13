@@ -113,6 +113,8 @@ function CreateRoom() {
     };
 
     try {
+      console.log(hotelData);
+      
       const response = await createHotel(hotelData);
       if (response) {
         setHotels([...hotels, { id: hotelData.id, name: hotelData.name }]);
