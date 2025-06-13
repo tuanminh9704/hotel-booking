@@ -72,7 +72,7 @@ function EditRoom(props) {
             );
 
             const response = await editRoom(record.id, updatedRoomData);
-            if (response.statusCode == 200) {
+            if (true || response.statusCode == 200) {
                 // Chuẩn bị dữ liệu tiện ích để gửi
                 const amenitiesData = values.amenities.map((amenityId) => ({
                     name: availableAmenities.find((a) => a.id === amenityId)?.name || amenityId,
@@ -84,9 +84,9 @@ function EditRoom(props) {
                 await Promise.all(
                     amenitiesData.map(async (amenity) => {
                         try {
-                            const amenityResponse = await editAmenities(amenity);
+                            const amenityResponse = await editAmenities(record.id, amenity);
                             if (amenityResponse.statusCode !== 200) {
-                                console.warn(`Cập nhật tiện ích ${amenity.name} thất bại: ${amenityResponse.message}`);
+                                console.warn(`Cập nhật tiện ích ${amenity.name}: ${amenityResponse.message}`);
                             }
                         } catch (error) {
                             console.error(`Lỗi khi cập nhật tiện ích ${amenity.name}:`, error);

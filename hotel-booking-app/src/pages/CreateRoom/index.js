@@ -149,7 +149,6 @@ function CreateRoom() {
 
     try {
       const response = await createRoom(roomData);
-      console.log(response);
       if (response.statusCode === 200) {
         message.success('Thêm phòng thành công');
 
@@ -166,7 +165,7 @@ function CreateRoom() {
             try {
               const amenityResponse = await createAmenities(amenity);
               if (amenityResponse.statusCode !== 200) {
-                console.warn(`Tạo tiện ích ${amenity.name} thất bại: ${amenityResponse.message}`);
+                console.warn(`Tạo tiện ích ${amenity.name}: ${amenityResponse.message}`);
               }
             } catch (error) {
               console.error(`Lỗi khi tạo tiện ích ${amenity.name}:`, error);

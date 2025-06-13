@@ -81,7 +81,7 @@ public class Utils {
         return roomTypeDTO;
     }
 
-    public static BookingDTO mapBookingEntityToBookingDTOPlusBookedRooms(Booking booking) {
+    public static BookingDTO mapBookingEntityToBookingDTOPlusBookedRooms(Booking booking, boolean mapUser) {
 
         BookingDTO bookingDTO = new BookingDTO();
 
@@ -89,7 +89,9 @@ public class Utils {
         bookingDTO.setCheckInDate(booking.getCheckInDate());
         bookingDTO.setCheckOutDate(booking.getCheckOutDate());
         bookingDTO.setStatus(booking.getStatus());
-       
+        if (mapUser) {
+            bookingDTO.setUser(Utils.mapUserEntityToUserDTO(booking.getUser()));
+        }
         if (booking.getRoomType() != null) {
             RoomType room = booking.getRoomType();
             RoomTypeDTO roomDTO = new RoomTypeDTO();
@@ -128,7 +130,7 @@ public class Utils {
         if (user.getBookings() != null && !user.getBookings().isEmpty()) {
             userDTO.setBookings(
                     user.getBookings().stream()
-                            .map((Booking booking) -> mapBookingEntityToBookingDTOPlusBookedRooms(booking))
+                            .map((Booking booking) -> mapBookingEntityToBookingDTOPlusBookedRooms(booking, false))
                             .collect(Collectors.toList()));
         }
         return userDTO;
@@ -227,4 +229,17 @@ public class Utils {
         return userList.stream().map(Utils::mapUserEntityToUserDTO).collect(Collectors.toList());
     }
 
+    public static AmenityDTO mapAmenityEntityToAmenityDTO(Amenity amenity) {
+        AmenityDTO dto = new AmenityDTO();
+        dto.setId(amenity.getId());
+        dto.setName(amenity.getName());
+        dto.setRoomTypeId(amenity.getRoomType() != null ? amenity.getRoomType().getId() : null);
+        return dto;
+    }
+
+    public static List<AmenityDTO> mapAmenityListEntityToDTOList(List<Amenity> amenities) {
+        return amenities.stream()
+                .map(Utils::mapAmenityEntityToAmenityDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getHotelByID } from '../../Service/HotelService';
 
 const BookingTable = ({ bookings }) => {
