@@ -2,8 +2,10 @@ package com.example.hotelbookingserver.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -88,20 +90,21 @@ public class UserService implements IUserService {
         return response;
     }
 
-    @Override
     public Response getAllUsers() {
-
         Response response = new Response();
         try {
-            List<User> userList = userRepository.findAll();
-            List<UserDTO> userDTOList = Utils.mapUserListEntityToUserListDTO(userList);
+            List<User> userList = userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+
+            List<UserDTO> userDTOList = userList.stream()
+                    .map(Utils::mapUserEntityToUserDTOPlusUserBookingsAndRoom)
+                    .collect(Collectors.toList());
+
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setUserList(userDTOList);
-
         } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage("Error getting all users " + e.getMessage());
+            response.setMessage("Error fetching users: " + e.getMessage());
         }
         return response;
     }
@@ -161,7 +164,7 @@ public class UserService implements IUserService {
 
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new OurException("User Not Found"));
-            UserDTO userDTO = Utils.mapUserEntityToUserDTO(user);
+            UserDTO userDTO = Utils.mapUserEntityToUserDTOPlusUserBookingsAndRoom(user);
             response.setStatusCode(200);
             response.setMessage("successful");
             response.setUser(userDTO);
