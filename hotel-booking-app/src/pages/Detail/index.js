@@ -200,7 +200,7 @@ function Detail() {
                             <iframe
                                 className="map"
                                 title="Bản đồ"
-                                src={data.linkMap}
+                                src={`https://www.google.com/maps?q=${encodeURIComponent(data.address)}&output=embed`}
                                 allowFullScreen={true}
                                 referrerPolicy="no-referrer-when-downgrade"
                                 loading="lazy"

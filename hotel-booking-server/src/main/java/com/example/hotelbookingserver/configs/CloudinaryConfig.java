@@ -10,7 +10,6 @@ import com.cloudinary.Cloudinary;
 
 @Configuration
 public class CloudinaryConfig {
-
     @Bean
     public Cloudinary getCloudinary() {
         Map config = new HashMap();

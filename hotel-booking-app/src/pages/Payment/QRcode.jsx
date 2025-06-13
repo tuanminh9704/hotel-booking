@@ -1,3 +1,5 @@
+
+
 export function QRcode (props){
     const { price } = props; 
 
@@ -5,6 +7,7 @@ export function QRcode (props){
         <>
             <div>QRcode</div>
             <h3>Vui lòng thanh toán: {price.toLocaleString("vi-VN")} VND</h3>
+
         </>
     )
 }

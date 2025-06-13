@@ -9,5 +9,5 @@ import com.example.hotelbookingserver.entities.Image;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image, UUID> {
-    void deleteByRoomTypeId(UUID roomTypeId);
+
 }

@@ -12,14 +12,9 @@ public class ImageDTO {
     private String imageUrl;
     private MultipartFile file;
 
-    private UUID hotelId;
-    private UUID roomTypeId;
-
-    public ImageDTO() {
-    }
-
     public ImageDTO(UUID id, String imageUrl) {
         this.id = id;
         this.imageUrl = imageUrl;
     }
+
 }

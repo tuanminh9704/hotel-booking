@@ -13,7 +13,7 @@ import com.example.hotelbookingserver.services.IBookingService;
 
 @RestController
 @RequestMapping("/bookings")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class BookingController {
 
     @Autowired

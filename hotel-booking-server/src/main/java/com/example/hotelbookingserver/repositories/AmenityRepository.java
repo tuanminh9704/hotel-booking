@@ -11,6 +11,4 @@ import com.example.hotelbookingserver.entities.RoomType;
 public interface AmenityRepository extends JpaRepository<Amenity, UUID> {
 
     List<Amenity> findByRoomType(RoomType roomType);
-
-    void deleteByRoomTypeId(UUID roomTypeId);
 }

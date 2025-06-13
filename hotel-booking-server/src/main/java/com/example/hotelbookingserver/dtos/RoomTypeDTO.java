@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Data;
@@ -26,12 +24,13 @@ public class RoomTypeDTO {
     private BigDecimal price;
     private List<AmenityDTO> amenities;
     private List<BookingDTO> bookings;
-    private List<ImageDTO> images;
-    private List<MultipartFile> imageFiles;
+    private List<String> imageFiles;
 
-    public RoomTypeDTO(UUID id, String name, int quantityBed, int quantityPeople, int roomArea, int quantityRoom,
-            BigDecimal price, List<AmenityDTO> amenities) {
+    public RoomTypeDTO(UUID id, UUID hotelId, String name, int quantityBed, int quantityPeople, int roomArea,
+            int quantityRoom, BigDecimal price, List<AmenityDTO> amenities, List<BookingDTO> bookings,
+            List<String> imageFiles) {
         this.id = id;
+        this.hotelId = hotelId;
         this.name = name;
         this.quantityBed = quantityBed;
         this.quantityPeople = quantityPeople;
@@ -39,6 +38,8 @@ public class RoomTypeDTO {
         this.quantityRoom = quantityRoom;
         this.price = price;
         this.amenities = amenities;
+        this.bookings = bookings;
+        this.imageFiles = imageFiles;
     }
 
 }

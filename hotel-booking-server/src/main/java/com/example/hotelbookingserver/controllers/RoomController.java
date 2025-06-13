@@ -7,13 +7,11 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -36,18 +34,19 @@ public class RoomController {
     private IRoomTypeService roomService;
 
     @Autowired
-    private IBookingService bookingService;
+    private IBookingService iBookingService;
 
-    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response> addNewRoom(@ModelAttribute RoomTypeDTO request) {
-        if (request.getHotelId() == null || request.getName() == null || request.getPrice() == null) {
+    @PostMapping("/add")
+    // @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Response> addNewRoom(@RequestBody RoomTypeDTO request) {
+        if (request.getName() == null || request.getName().isEmpty() || request.getPrice() == null) {
             Response response = new Response();
             response.setStatusCode(400);
-            response.setMessage("Vui lòng điền đầy đủ thông tin.");
+            response.setMessage("Please provide values for all fields (name, price)");
             return ResponseEntity.status(response.getStatusCode()).body(response);
         }
 
-        Response response = roomService.addNewRoom(request.getHotelId(), request);
+        Response response = roomService.addNewRoom(request);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
@@ -97,12 +96,13 @@ public class RoomController {
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
-    @PutMapping(value = "/update/{roomId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/update/{roomId}")
+    // @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateRoom(
             @PathVariable UUID roomId,
-            @ModelAttribute RoomTypeDTO roomTypeDTO) {
+            @RequestBody RoomTypeDTO roomTypeDTO) {
 
-        Response response = roomService.updateRoom(roomId, roomTypeDTO);
+        Response response = roomService.updateRoom(roomTypeDTO, roomId);
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }
 
