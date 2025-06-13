@@ -1,30 +1,48 @@
 import { useState, useEffect } from 'react';
 import { getHotelByID } from '../../Service/HotelService';
+import { getUserById } from '../../Service/UserServices';
+
 
 const BookingTable = ({ bookings }) => {
-  const [hotels, setHotels] = useState([]);
+  const [hotelMap, setHotelMap] = useState({});
+  const [userMap, setUserMap] = useState({});
 
   useEffect(() => {
-    const fetchHotels = async () => {
-      const data = bookings.slice(0, 10);
-      const hotelsData = await Promise.all(data.map(b => getHotelByID(b.hotelId)));
-      setHotels(hotelsData);
+    const fetchHotelsAndUsers = async () => {
+      const uniqueHotelIds = [...new Set(bookings.map(b => b.hotelId))];
+      const uniqueUserIds = [...new Set(bookings.map(b => b.userId))];
+
+      // Lấy danh sách khách sạn
+      const hotelEntries = await Promise.all(
+        uniqueHotelIds.map(async (id) => {
+          const hotel = await getHotelByID(id);
+          return [id, hotel.hotelList?.[0]];
+        })
+      );
+
+      // Lấy danh sách người dùng
+      const userEntries = await Promise.all(
+        uniqueUserIds.map(async (id) => {
+          const user = await getUserById(id);
+          return [id, user.user];
+        })
+      );
+
+      setHotelMap(Object.fromEntries(hotelEntries));
+      setUserMap(Object.fromEntries(userEntries));
     };
 
-    fetchHotels();
+    fetchHotelsAndUsers();
   }, [bookings]);
 
-  const parseDate = (dateStr) => {
-    const [day, month, year] = dateStr.split('/').map(Number);
-    return new Date(year, month - 1, day);
-  };
-  
+  const parseDate = (dateStr) => new Date(dateStr);
+
   const sortedBookings = [...bookings].sort((a, b) => {
-    const dateA = parseDate(a.date?.[0] || '01/01/1970');
-    const dateB = parseDate(b.date?.[0] || '01/01/1970');
+    const dateA = parseDate(a.checkInDate);
+    const dateB = parseDate(b.checkInDate);
     return dateB - dateA;
   });
-  
+
   const data = sortedBookings.slice(0, 10);
 
   return (
@@ -42,26 +60,29 @@ const BookingTable = ({ bookings }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((booking, index) => {
-            const hotel = hotels[index];
+          {data.map((booking) => {
+            const hotel = hotelMap[booking.hotelId];
+            const user = userMap[booking.userId];
+            const status = booking.status?.toLowerCase();
+
             return (
               <tr key={booking.id}>
                 <td>{booking.id}</td>
-                <td>{booking.fullName || booking.customer}</td>
-                <td>{hotel ? hotel.name : 'Đang tải...'}</td>
-                <td>{booking.date ? booking.date[0] : 'N/A'}</td>
-                <td>{booking.date ? booking.date[1] : 'N/A'}</td>
+                <td>{user?.fullName || user?.name || 'Đang tải...'}</td>
+                <td>{hotel?.name || 'Đang tải...'}</td>
+                <td>{booking.checkInDate || 'N/A'}</td>
+                <td>{booking.checkOutDate || 'N/A'}</td>
                 <td>
                   <span
                     className={`status ${
-                      booking.status === 'Confirmed'
+                      status === 'confirmed'
                         ? 'status-confirmed'
-                        : booking.status === 'Pending'
+                        : status === 'pending'
                         ? 'status-pending'
                         : 'status-cancelled'
                     }`}
                   >
-                    {booking.status || 'N/A'}
+                    {status?.charAt(0).toUpperCase() + status?.slice(1) || 'N/A'}
                   </span>
                 </td>
               </tr>

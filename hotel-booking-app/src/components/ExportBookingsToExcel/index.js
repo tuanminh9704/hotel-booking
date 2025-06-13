@@ -1,29 +1,39 @@
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { getHotelByID } from '../../Service/HotelService';
+import { getUserById } from '../../Service/UserServices';
+import { getRoomById } from '../../Service/RoomService';
 
-export const exportBookingsToExcel = (bookings) => {
-    console.log(bookings);
-    
 
+export const exportBookingsToExcel = async (bookings) => {
   if (!bookings || bookings.length === 0) {
     alert('Không có dữ liệu để xuất');
     return;
   }
 
-  // Chuyển đổi dữ liệu sang định dạng Excel-friendly
-  const excelData = bookings.map((b) => ({
-    ID: b.id,
-    'Khách hàng': b.fullName || 'N/A',
-    Email: b.email || 'N/A',
-    'Số điện thoại': b.phone || 'N/A',
-    'Khách sạn': b.hotelId || 'N/A',
-    'Loại phòng': b.roomTypeId || 'N/A',
-    'Ngày đến': b.date?.[0] || 'N/A',
-    'Ngày đi': b.date?.[1] || 'N/A',
-    'Trạng thái': b.status || 'N/A',
-  }));
+  // Lấy thông tin chi tiết từng booking (hotelName, fullName,...)
+  const enrichedBookings = await Promise.all(
+    bookings.map(async (b) => {
+      const hotel = await getHotelByID(b.hotelId);
+      const user = await getUserById(b.userId);
+      const room = await getRoomById(b.roomTypeId)
 
-  const worksheet = XLSX.utils.json_to_sheet(excelData);
+      return {
+        ID: b.id,
+        'Khách hàng': user.user?.name || 'N/A',
+        'Email': user.user?.email || 'N/A',
+        'Số điện thoại': user.user?.phoneNumber || 'N/A',
+        'Khách sạn': hotel.hotelList[0]?.name || 'N/A',
+        'Loại phòng': room.room.name || 'N/A',
+        'Ngày đến': b.checkInDate || 'N/A',
+        'Ngày đi': b.checkOutDate || 'N/A',
+        'Trạng thái': b.status || 'N/A',
+      };
+    })
+  );
+
+  // Tạo file Excel
+  const worksheet = XLSX.utils.json_to_sheet(enrichedBookings);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Đặt phòng');
 

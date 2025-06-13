@@ -1,4 +1,3 @@
-import React from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -16,23 +15,24 @@ ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend,
 function MultiLine({ data }) {
   const bookings = data;
 
+  console.log(bookings);
+
   // Chuyển đổi dữ liệu bookings thành số lượng đặt phòng theo tháng
   const calculateMonthlyBookings = (bookings) => {
     if (!bookings || bookings.length === 0) {
-      return Array(12).fill(0); // Trả về mảng 0 nếu không có dữ liệu
+      return Array(12).fill(0);
     }
 
-    const monthlyCount = Array(12).fill(0); // Mảng 12 tháng (0-based: 0 = Jan, 1 = Feb, ...)
-    const currentYear = new Date().getFullYear(); // 2025
+    const monthlyCount = Array(12).fill(0);
+    const currentYear = new Date().getFullYear(); // ví dụ: 2025
 
     bookings.forEach((booking) => {
-      const checkInDate = booking.checkInDate; // "dd/mm/yyyy"
-      const [day, month, year] = checkInDate.split('/');
-      if (parseInt(year) === currentYear) {
-        const monthIndex = parseInt(month) - 1; // Chuyển sang 0-based (Jan = 0)
-        if (monthIndex >= 0 && monthIndex < 12) {
-          monthlyCount[monthIndex] += 1;
-        }
+      const date = new Date(booking.checkInDate); // ISO format: yyyy-mm-dd
+      const year = date.getFullYear();
+      const month = date.getMonth(); // 0-based (0 = Jan)
+
+      if (year === currentYear) {
+        monthlyCount[month] += 1;
       }
     });
 

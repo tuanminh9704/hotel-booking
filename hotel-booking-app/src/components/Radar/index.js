@@ -39,7 +39,7 @@ const DemoRadar = ({ data }) => {
       );
   
       bookings.forEach((booking, index) => {
-        const hotel = hotels[index];
+        const hotel = hotels[index].hotelList[0];
         if (!hotel) return;
   
         const address = hotel.address || '';
