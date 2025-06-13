@@ -2,6 +2,7 @@ package com.example.hotelbookingserver.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "hotels")
 public class Hotel {

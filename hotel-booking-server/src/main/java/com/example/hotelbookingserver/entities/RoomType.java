@@ -2,6 +2,7 @@ package com.example.hotelbookingserver.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import org.hibernate.type.SqlTypes;
 
 @Entity
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "room_types")
 public class RoomType {
 

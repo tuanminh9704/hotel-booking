@@ -18,4 +18,6 @@ public interface ICloudiraryService {
     Image uploadRoomTypeImage(MultipartFile file, RoomType roomType);
 
     List<Image> uploadRoomTypeImages(List<MultipartFile> files, RoomType roomType);
+
+    List<Image> uploadHotelImages(List<MultipartFile> files, Hotel hotel);
 }
