@@ -23,6 +23,10 @@ $blue: #2563eb;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden; // Ngăn nội dung tràn ra ngoài card
+      display: flex;
+      flex-direction: column; // Sắp xếp theo chiều dọc
+      height: 100%; // Đảm bảo card chiếm toàn chiều cao của col
 
       &:hover {
         transform: translateY(-5px);
@@ -33,6 +37,7 @@ $blue: #2563eb;
       .ant-card-head {
         padding: 12px 16px;
         border-bottom: 1px solid $gray-100;
+        flex-shrink: 0; // Ngăn header bị co lại
 
         .ant-card-head-title {
           font-size: 16px;
@@ -46,6 +51,10 @@ $blue: #2563eb;
 
       .ant-card-body {
         padding: 16px;
+        flex-grow: 1; // Cho phép body mở rộng
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
     }
   }
@@ -70,6 +79,7 @@ $blue: #2563eb;
     height: 150px; // Chiều cao cố định để hình ảnh đồng đều
     overflow: hidden;
     border-radius: 6px;
+    flex-shrink: 0; // Ngăn ảnh bị co lại
 
     img {
       width: 100%;
@@ -86,6 +96,8 @@ $blue: #2563eb;
   // Content
   .content {
     margin-top: 12px;
+    flex-grow: 1; // Cho phép content mở rộng
+    overflow: hidden; // Ngăn nội dung tràn ra ngoài
 
     .title {
       font-size: 16px;
@@ -114,6 +126,9 @@ $blue: #2563eb;
       text-decoration: none;
       display: block;
       margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:hover {
         text-decoration: underline;
@@ -136,6 +151,9 @@ $blue: #2563eb;
       font-size: 14px;
       color: $green-600;
       margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
 
       .anticon {
         margin-right: 4px;
@@ -144,12 +162,14 @@ $blue: #2563eb;
 
     .rate {
       margin-top: 8px;
+      margin-bottom: 8px;
     }
   }
 
   // Card Price
   .card-price {
     margin-top: 12px;
+    flex-shrink: 0; // Ngăn phần giá bị co lại
 
     .card-price__item {
       text-align: center;
@@ -158,6 +178,9 @@ $blue: #2563eb;
         font-size: 12px;
         color: $gray-500;
         margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .price {
@@ -166,6 +189,9 @@ $blue: #2563eb;
         color: $gray-800;
         margin-bottom: 4px;
         display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .ant-btn {
@@ -187,6 +213,9 @@ $blue: #2563eb;
           align-items: center;
           justify-content: center;
           gap: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }
@@ -199,6 +228,7 @@ $blue: #2563eb;
     .ant-card {
       &.card-item {
         max-width: 100%; // Chiếm toàn bộ chiều rộng trên mobile
+        min-height: 400px; // Đảm bảo chiều cao tối thiểu để tránh tràn
       }
     }
 

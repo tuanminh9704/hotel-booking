@@ -12,7 +12,6 @@ import { SearchOutlined } from "@ant-design/icons";
 import GridHotel from "../../components/GridHotel";
 import { getHotels } from "../../Service/HotelService";
 
-
 const { Content, Footer } = Layout;
 
 function capitalizeWords(str) {
@@ -28,7 +27,7 @@ export default function Home() {
   const [keyword, setKeyword] = useState("");
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(6); // Số hotel hiển thị mỗi trang
+  const [pageSize, setPageSize] = useState(8); // Số hotel hiển thị mỗi trang
   const [totalHotels, setTotalHotels] = useState(0);
 
   const token = localStorage.getItem("accessToken");
@@ -39,27 +38,25 @@ export default function Home() {
     localStorage.removeItem("email");
     localStorage.removeItem("phone");
     localStorage.removeItem("role");
-    localStorage.removeItem("userId")
-    navigate("/")
-  }
+    localStorage.removeItem("userId");
+    navigate("/");
+  };
 
   useEffect(() => {
-  const fetchAPI = async () => {
-    try {
-      const response = await getHotels();
-      const list = response?.hotelList ?? []; // fallback nếu undefined
-      setData(list);
-      setTotalHotels(list.length);
-    } catch (error) {
-      console.error("Lỗi khi gọi API khách sạn:", error);
-      setData([]);
-      setTotalHotels(0);
-    }
-  };
-  fetchAPI();
-}, []);
-
-
+    const fetchAPI = async () => {
+      try {
+        const response = await getHotels();
+        const list = response?.hotelList ?? []; // fallback nếu undefined
+        setData(list);
+        setTotalHotels(list.length);
+      } catch (error) {
+        console.error("Lỗi khi gọi API khách sạn:", error);
+        setData([]);
+        setTotalHotels(0);
+      }
+    };
+    fetchAPI();
+  }, []);
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -82,110 +79,111 @@ export default function Home() {
   };
 
   return (
-    <>
-      <Layout className="layout-welcome">
-        <header className="layout-welcome__header">
-          <div className="video-background">
-            <video autoPlay loop muted playsInline>
-              <source src={video_background} type="video/mp4" />
-              Trình duyệt của bạn không hỗ trợ video.
-            </video>
-            <div className="content">
-              <div className="login-language">
+    <Layout className="layout-welcome">
+      <header className="layout-welcome__header">
+        <div className="video-background">
+          <video autoPlay loop muted playsInline>
+            <source src={video_background} type="video/mp4" />
+            Trình duyệt của bạn không hỗ trợ video.
+          </video>
+          <div className="content">
+            <div className="login-language">
+              {token ? (
+                <Link onClick={handleLogout}>
+                  Đăng xuất <LeftOutlined /> /
+                </Link>
+              ) : (
+                <Link to='/auth'>
+                  Đăng nhập <RightOutlined /> /
+                </Link>
+              )}
+              <LanguageSelector />
+              <div className="profile">
                 {token ? (
-                  <>
-                    <Link onClick={handleLogout}>Đăng xuất <LeftOutlined /> / </Link>
-                  </>
+                  <Link to='/profile'>{capitalizeWords(localStorage.getItem("fullName"))}</Link>
                 ) : (
-                  <>
-                    <Link to='/auth'>Đăng nhập <RightOutlined /> / </Link>
-                  </>
+                  <></>
                 )}
-
-                <LanguageSelector />
-                <div className="profile">
-                  {token ? (
-                    <Link to='/profile'>{capitalizeWords(localStorage.getItem("fullName"))}</Link>
-                  )
-                    :
-                    (
-                      <></>
-                    )
-                  }
-                </div>
               </div>
-              <div className="logo">
-                <Link to={"/"}>HotelBooking.com</Link>
-              </div>
-              <div className="menu"><TopMenu /></div>
-              <div className="title">Tìm chỗ nghỉ tiếp theo</div>
-              <div className="desciption">Tìm ưu đãi khách sạn, chỗ nghỉ dạng nhà và nhiều hơn nữa...</div>
-              <Button className="button-discover"><Link to={'/discover'}><span>Khám phá</span><BsArrowRight /></Link></Button>
             </div>
-          </div>
-          {/* search mới */}
-          <div className="search">
-            <div className="hotel-search-bar noborder">
-              <div className="search-item">
-                <SearchOutlined className="icon" />
-                <Input
-                  placeholder="Nhập tên khách sạn hoặc địa điểm"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  className="input-field"
-                  variant="borderless"
-                  onPressEnter={handleSearch}
-                />
-              </div>
-              <Button type="primary" className="search-button" onClick={handleSearch}>Tìm</Button>
+            <div className="logo">
+              <Link to={"/"}>HotelBooking.com</Link>
             </div>
+            <div className="menu"><TopMenu /></div>
+            <div className="title">Tìm chỗ nghỉ tiếp theo</div>
+            <div className="desciption">Tìm ưu đãi khách sạn, chỗ nghỉ dạng nhà và nhiều hơn nữa...</div>
+            <Button className="button-discover">
+              <Link to={'/discover'}>
+                <span>Khám phá</span>
+                <BsArrowRight />
+              </Link>
+            </Button>
           </div>
-        </header>
-
-        <Content className="layout-welcome__conten">
-          <h1 className="title">Gợi ý các chỗ nghỉ cho bạn</h1>
-          <GridHotel data={getCurrentPageData()} />
-
-          {/* Pagination Component */}
-          {totalHotels > 0 && (
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: '40px',
-              marginBottom: '20px'
-            }}>
-              <Pagination
-                current={currentPage}
-                total={totalHotels}
-                pageSize={pageSize}
-                onChange={handlePageChange}
-                showSizeChanger={true}
-                showQuickJumper={true}
-                showTotal={(total, range) =>
-                  `${range[0]}-${range[1]} của ${total} khách sạn`
-                }
-                pageSizeOptions={['6', '12', '18', '24']}
-                locale={{
-                  items_per_page: '/ trang',
-                  jump_to: 'Đến trang',
-                  jump_to_confirm: 'xác nhận',
-                  page: '',
-                  prev_page: 'Trang trước',
-                  next_page: 'Trang sau',
-                  prev_5: '5 trang trước',
-                  next_5: '5 trang sau',
-                  prev_3: '3 trang trước',
-                  next_3: '3 trang sau'
-                }}
+        </div>
+        {/* search mới */}
+        <div className="search">
+          <div className="hotel-search-bar noborder">
+            <div className="search-item">
+              <SearchOutlined className="icon" />
+              <Input
+                placeholder="Nhập tên khách sạn hoặc địa điểm"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="input-field"
+                variant="borderless"
+                onPressEnter={handleSearch}
               />
             </div>
-          )}
-        </Content>
+            <Button type="primary" className="search-button" onClick={handleSearch}>
+              Tìm
+            </Button>
+          </div>
+        </div>
+      </header>
 
-        <Footer className="layout-home__footer">
-          2025 copyright @Nhom5
-        </Footer>
-      </Layout>
-    </>
-  )
+      <Content className="layout-welcome__conten">
+        <h1 className="title">Gợi ý các chỗ nghỉ cho bạn</h1>
+        <GridHotel data={getCurrentPageData()} />
+
+        {/* Pagination Component */}
+        {totalHotels > 0 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '40px',
+            marginBottom: '20px'
+          }}>
+            <Pagination
+              current={currentPage}
+              total={totalHotels}
+              pageSize={pageSize}
+              onChange={handlePageChange}
+              showSizeChanger={true}
+              showQuickJumper={true}
+              showTotal={(total, range) =>
+                `${range[0]}-${range[1]} của ${total} khách sạn`
+              }
+              pageSizeOptions={['8', '16', '24', '32']}
+              locale={{
+                items_per_page: '/ trang',
+                jump_to: 'Đến trang',
+                jump_to_confirm: 'xác nhận',
+                page: '',
+                prev_page: 'Trang trước',
+                next_page: 'Trang sau',
+                prev_5: '5 trang trước',
+                next_5: '5 trang sau',
+                prev_3: '3 trang trước',
+                next_3: '3 trang sau'
+              }}
+            />
+          </div>
+        )}
+      </Content>
+
+      <Footer className="layout-home__footer">
+        2025 copyright @Nhom5
+      </Footer>
+    </Layout>
+  );
 }

@@ -1,9 +1,6 @@
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { getHotelByID } from '../../Service/HotelService';
-import { getUserById } from '../../Service/UserServices';
-import { getRoomById } from '../../Service/RoomService';
-
 
 export const exportBookingsToExcel = async (bookings) => {
   if (!bookings || bookings.length === 0) {
@@ -11,20 +8,24 @@ export const exportBookingsToExcel = async (bookings) => {
     return;
   }
 
-  // Lấy thông tin chi tiết từng booking (hotelName, fullName,...)
+  // Lấy thông tin chi tiết từng booking (hotelName,...)
   const enrichedBookings = await Promise.all(
     bookings.map(async (b) => {
-      const hotel = await getHotelByID(b.hotelId);
-      const user = await getUserById(b.userId);
-      const room = await getRoomById(b.roomTypeId)
+      let hotelName = 'N/A';
+      try {
+        const response = await getHotelByID(b.hotelId);
+        hotelName = response?.hotelList?.[0]?.name || 'N/A';
+      } catch (error) {
+        console.error(`Error fetching hotel ${b.hotelId}:`, error);
+      }
 
       return {
         ID: b.id,
-        'Khách hàng': user.user?.name || 'N/A',
-        'Email': user.user?.email || 'N/A',
-        'Số điện thoại': user.user?.phoneNumber || 'N/A',
-        'Khách sạn': hotel.hotelList[0]?.name || 'N/A',
-        'Loại phòng': room.room.name || 'N/A',
+        'Khách hàng': b.user?.name || 'N/A',
+        'Email': b.user?.email || 'N/A',
+        'Số điện thoại': b.user?.phoneNumber || 'N/A',
+        'Khách sạn': hotelName,
+        'Loại phòng': b.room?.name || 'N/A',
         'Ngày đến': b.checkInDate || 'N/A',
         'Ngày đi': b.checkOutDate || 'N/A',
         'Trạng thái': b.status || 'N/A',

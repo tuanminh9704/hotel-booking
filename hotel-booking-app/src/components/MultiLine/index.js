@@ -15,8 +15,6 @@ ChartJS.register(LineElement, PointElement, LinearScale, Title, Tooltip, Legend,
 function MultiLine({ data }) {
   const bookings = data;
 
-  console.log(bookings);
-
   // Chuyển đổi dữ liệu bookings thành số lượng đặt phòng theo tháng
   const calculateMonthlyBookings = (bookings) => {
     if (!bookings || bookings.length === 0) {

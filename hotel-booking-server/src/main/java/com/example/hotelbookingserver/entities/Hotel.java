@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-@Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "hotels")
 public class Hotel {
     @Id
@@ -33,7 +33,6 @@ public class Hotel {
     @Column(nullable = false)
     private String address;
 
-    @Column(length = 1000)
     private String linkMap;
 
     private String description;

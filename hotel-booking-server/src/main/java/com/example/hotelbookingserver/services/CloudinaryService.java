@@ -59,6 +59,13 @@ public class CloudinaryService implements ICloudiraryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Image> uploadHotelImages(List<MultipartFile> files, Hotel hotel) {
+        return files.stream()
+                .map(file -> uploadHotelImage(file, hotel))
+                .collect(Collectors.toList());
+    }
+
     public List<String> uploadMultipleFiles(List<MultipartFile> files) {
         return files.stream()
                 .map(this::uploadToCloudinary)

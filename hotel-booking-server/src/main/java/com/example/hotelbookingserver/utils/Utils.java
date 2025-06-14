@@ -99,6 +99,9 @@ public class Utils {
             roomDTO.setRoomArea(booking.getRoomType().getRoomArea());
             roomDTO.setQuantityRoom(booking.getRoomType().getQuantityRoom());
             roomDTO.setPrice(booking.getRoomType().getPrice());
+            bookingDTO.setHotelId(room.getHotel().getId());
+            System.out.println("Hotel ID: " + bookingDTO.getHotelId());
+
             if (room.getAmenities() != null && !room.getAmenities().isEmpty()) {
                 roomDTO.setAmenities(
                         room.getAmenities().stream().map(amenity -> {

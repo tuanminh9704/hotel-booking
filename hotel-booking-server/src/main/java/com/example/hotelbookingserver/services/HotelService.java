@@ -20,6 +20,8 @@ import com.example.hotelbookingserver.dtos.AmenityDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +43,9 @@ public class HotelService implements IHotelService {
 
         @Autowired
         private ReviewsRepository reviewsRepository;
+
+        @Autowired
+        private CloudinaryService cloudinaryService;
 
         @Override
         public Response getAllHotels() {
@@ -99,17 +104,31 @@ public class HotelService implements IHotelService {
                         hotel.setCheckInTime(requestDTO.getCheckInTime());
                         hotel.setCheckOutTime(requestDTO.getCheckOutTime());
 
+                        // ✅ Upload thumbnail nếu có
+                        if (requestDTO.getThumbnailFile() != null && !requestDTO.getThumbnailFile().isEmpty()) {
+                                String thumbnailUrl = cloudinaryService
+                                                .uploadToCloudinary(requestDTO.getThumbnailFile());
+                                hotel.setThumbnail(thumbnailUrl);
+                        } else {
+                                hotel.setThumbnail(requestDTO.getThumbnail()); // fallback nếu đã có sẵn URL
+                        }
+
                         Hotel savedHotel = hotelRepository.save(hotel);
 
+                        // ✅ Upload ảnh phụ nếu có (dưới dạng file)
+                        if (requestDTO.getImageFiles() != null && !requestDTO.getImageFiles().isEmpty()) {
+                                cloudinaryService.uploadHotelImages(requestDTO.getImageFiles(), savedHotel);
+                        }
+
+                        // ✅ Lưu ảnh phụ từ URL nếu có
                         if (requestDTO.getImages() != null) {
                                 for (ImageDTO imgDTO : requestDTO.getImages()) {
-                                        if (imgDTO == null || imgDTO.getImageUrl() == null)
-                                                continue; // ⭐ Sửa ở đây
-
-                                        Image image = new Image();
-                                        image.setImageUrl(imgDTO.getImageUrl());
-                                        image.setHotel(savedHotel);
-                                        imageRepository.save(image);
+                                        if (imgDTO.getImageUrl() != null && !imgDTO.getImageUrl().isBlank()) {
+                                                Image image = new Image();
+                                                image.setImageUrl(imgDTO.getImageUrl());
+                                                image.setHotel(savedHotel);
+                                                imageRepository.save(image);
+                                        }
                                 }
                         }
 

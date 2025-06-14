@@ -19,6 +19,22 @@ function CreateRoom() {
   const [isLoadingRoom, setIsLoadingRoom] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState(''); // URL cho thumbnail
   const [imagesUrl, setImagesUrl] = useState([]); // Mảng URL cho images
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+
+  const handleFileChange = (e) => {
+    setSelectedFiles([...e.target.files]);
+  };
+
+  const handleUpload = async () => {
+    const formData = new FormData();
+    selectedFiles.forEach((file) => {
+      formData.append("files", file);
+    });
+  };
+
+  console.log(selectedFiles);
+
 
   const availableAmenities = [
     { id: 'amenity1', name: 'Ban công' },
@@ -85,40 +101,49 @@ function CreateRoom() {
 
   const handleCreateHotel = async (values) => {
     setIsLoadingHotel(true);
-    const hotelData = {
-      name: values.name,
-      thumbnail: thumbnailUrl || '',
-      address: values.address,
-      linkMap: values.linkMap || '',
-      description: values.description || '',
-      rate: values.rate || 0,
-      checkInTime: values.checkInTime ? dayjs(values.checkInTime).format('HH:mm') : '',
-      checkOutTime: values.checkOutTime ? dayjs(values.checkOutTime).format('HH:mm') : '',
-      // service: values.service || [],
-      // images: [...imagesUrl, ...values.images?.map((file) => file.response?.url || file.url)] || [],
-    };
+
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('address', values.address);
+    formData.append('linkMap', values.linkMap || '');
+    formData.append('description', values.description || '');
+    formData.append('rate', values.rate || 0);
+    formData.append('checkInTime', values.checkInTime ? dayjs(values.checkInTime).format('HH:mm') : '');
+    formData.append('checkOutTime', values.checkOutTime ? dayjs(values.checkOutTime).format('HH:mm') : '');
+
+    // Thumbnail
+    if (selectedFiles.length > 0) {
+      formData.append("thumbnail", thumbnailUrl); // ảnh đại diện
+    }
+
+    // Images (danh sách ảnh)
+    selectedFiles.forEach((file) => {
+      formData.append("images", file); // backend phải có List<MultipartFile> images
+    });
 
     try {
-      console.log(hotelData);
-      const response = await createHotel(hotelData);
-      console.log(response);
-      if (response.statusCode === 201) {
-        setHotels([...hotels, { id: response.data?.id || hotelData.id, name: hotelData.name }]);
-        setSelectedHotel(response.data?.id || hotelData.id);
-        setThumbnailUrl('');
-        setImagesUrl([]);
-        message.success('Thêm khách sạn thành công');
+      const response = await fetch('http://localhost:8081/hotels/add', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.statusCode === 201) {
+        message.success('Thêm khách sạn thành công!');
         formHotel.resetFields();
+        setSelectedFiles([]);
       } else {
-        message.error(`Thêm khách sạn thất bại: ${response.message || 'Lỗi không xác định'}`);
+        message.error(`Thêm khách sạn thất bại: ${result.message}`);
       }
     } catch (error) {
-      console.error('Lỗi khi tạo khách sạn:', error);
-      message.error(`Lỗi hệ thống: ${error.message}`);
+      console.error(error);
+      message.error('Lỗi hệ thống khi gửi yêu cầu');
     } finally {
       setIsLoadingHotel(false);
     }
   };
+
 
   const handleCreateRoom = async (values) => {
     if (!selectedHotel) {
@@ -140,7 +165,7 @@ function CreateRoom() {
     try {
       const response = await createRoom(roomData);
       console.log(response);
-      
+
       if (response.statusCode === 201) {
         message.success('Thêm phòng thành công');
 
@@ -196,7 +221,7 @@ function CreateRoom() {
   };
 
   const handleImagesUpload = ({ file, fileList }) => {
-    console.log('Images upload:', { file, fileList });
+    console.log({ file });
     if (file.status === 'done') {
       const url = file.response[0];
       setImagesUrl((prev) => [...prev, url]);
@@ -300,23 +325,10 @@ function CreateRoom() {
                   getValueFromEvent={handleNormFile}
                   rules={[{ required: false }]}
                 >
-                  <Upload
-                    name="files"
-                    action="http://localhost:8081/images/upload-multiple"
-                    listType="picture"
-                    multiple
-                    maxCount={100}
-                    onChange={handleImagesUpload}
-                  >
-                    <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
-                  </Upload>
-                  {imagesUrl.length > 0 && (
-                    <div style={{ marginTop: 20 }}>
-                      {imagesUrl.map((url, index) => (
-                        <img key={index} src={url} alt={`Image ${index + 1}`} style={{ maxWidth: '200px', marginRight: '10px' }} />
-                      ))}
-                    </div>
-                  )}
+                  <div>
+                    <input type="file" multiple accept="image/*" onChange={handleFileChange} />
+                    <Button icon={<UploadOutlined />} onClick={handleUpload}>Tải ảnh lên</Button>
+                  </div>
                 </Form.Item>
               </Col>
               <Col span={24}>
