@@ -14,7 +14,7 @@ import java.util.List;
 public class HotelDTO {
     private UUID id;
     private String name;
-    private String thumbnail;
+    private MultipartFile thumbnail;
     private String address;
     private String linkMap;
     private String description;
@@ -25,7 +25,6 @@ public class HotelDTO {
     private List<RoomTypeDTO> roomTypes;
     private List<ReviewsDTO> reviews;
 
-    private MultipartFile thumbnailFile;
     private List<MultipartFile> imageFiles;
 
 }

@@ -99,6 +99,10 @@ public class Utils {
             roomDTO.setRoomArea(booking.getRoomType().getRoomArea());
             roomDTO.setQuantityRoom(booking.getRoomType().getQuantityRoom());
             roomDTO.setPrice(booking.getRoomType().getPrice());
+
+            bookingDTO.setHotelId(room.getHotel().getId());
+            System.out.println("Hotel ID: " + bookingDTO.getHotelId());
+
             if (room.getAmenities() != null && !room.getAmenities().isEmpty()) {
                 roomDTO.setAmenities(
                         room.getAmenities().stream().map(amenity -> {
@@ -229,7 +233,6 @@ public class Utils {
         // Thiết lập thông tin cho HotelDTO
         hotelDTO.setId(hotel.getId());
         hotelDTO.setName(hotel.getName());
-        hotelDTO.setThumbnail(hotel.getThumbnail());
         hotelDTO.setAddress(hotel.getAddress());
         hotelDTO.setLinkMap(hotel.getLinkMap());
         hotelDTO.setDescription(hotel.getDescription());

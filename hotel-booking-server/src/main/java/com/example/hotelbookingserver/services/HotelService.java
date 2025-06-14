@@ -96,7 +96,6 @@ public class HotelService implements IHotelService {
                 try {
                         Hotel hotel = new Hotel();
                         hotel.setName(requestDTO.getName());
-                        hotel.setThumbnail(requestDTO.getThumbnail());
                         hotel.setAddress(requestDTO.getAddress());
                         hotel.setLinkMap(requestDTO.getLinkMap());
                         hotel.setDescription(requestDTO.getDescription());
@@ -104,37 +103,21 @@ public class HotelService implements IHotelService {
                         hotel.setCheckInTime(requestDTO.getCheckInTime());
                         hotel.setCheckOutTime(requestDTO.getCheckOutTime());
 
-                        // ✅ Upload thumbnail nếu có
-                        if (requestDTO.getThumbnailFile() != null && !requestDTO.getThumbnailFile().isEmpty()) {
-                                String thumbnailUrl = cloudinaryService
-                                                .uploadToCloudinary(requestDTO.getThumbnailFile());
+                        if (requestDTO.getThumbnail() != null && !requestDTO.getThumbnail().isEmpty()) {
+                                String thumbnailUrl = cloudinaryService.uploadToCloudinary(requestDTO.getThumbnail());
                                 hotel.setThumbnail(thumbnailUrl);
-                        } else {
-                                hotel.setThumbnail(requestDTO.getThumbnail()); // fallback nếu đã có sẵn URL
                         }
 
                         Hotel savedHotel = hotelRepository.save(hotel);
 
-                        // ✅ Upload ảnh phụ nếu có (dưới dạng file)
-                        if (requestDTO.getImageFiles() != null && !requestDTO.getImageFiles().isEmpty()) {
-                                cloudinaryService.uploadHotelImages(requestDTO.getImageFiles(), savedHotel);
+                        List<MultipartFile> imageFiles = requestDTO.getImageFiles();
+                        if (imageFiles != null && !imageFiles.isEmpty()) {
+                                cloudinaryService.uploadHotelImages(imageFiles, savedHotel);
                         }
-
-                        // ✅ Lưu ảnh phụ từ URL nếu có
-                        if (requestDTO.getImages() != null) {
-                                for (ImageDTO imgDTO : requestDTO.getImages()) {
-                                        if (imgDTO.getImageUrl() != null && !imgDTO.getImageUrl().isBlank()) {
-                                                Image image = new Image();
-                                                image.setImageUrl(imgDTO.getImageUrl());
-                                                image.setHotel(savedHotel);
-                                                imageRepository.save(image);
-                                        }
-                                }
-                        }
-
                         if (requestDTO.getRoomTypes() != null) {
                                 for (RoomTypeDTO rtDTO : requestDTO.getRoomTypes()) {
                                         RoomType roomType = new RoomType();
+
                                         roomType.setName(rtDTO.getName());
                                         roomType.setQuantityBed(rtDTO.getQuantityBed());
                                         roomType.setQuantityPeople(rtDTO.getQuantityPeople());
