@@ -20,7 +20,7 @@ function ListHotel(props) {
                 <Row gutter={[20, 20]}>
                   <Col xxl={9} xl={9} lg={9} md={9} sm={24} span={24}>
                     <div className="image">
-                      <img src={item.thumbnail} alt="ảnh khách sạn"></img>
+                      <img src={item?.images[0]?.imageUrl || ""} alt="ảnh khách sạn"></img>
                     </div>
                   </Col>
                   <Col xxl={11} xl={11} lg={11} md={11} sm={24} span={24}>

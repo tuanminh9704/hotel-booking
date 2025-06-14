@@ -17,7 +17,7 @@ function CreateRoom() {
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [isLoadingHotel, setIsLoadingHotel] = useState(false);
   const [isLoadingRoom, setIsLoadingRoom] = useState(false);
-  const [thumbnailUrl, setThumbnailUrl] = useState(''); // URL cho thumbnail
+  const [thumbnailFile, setThumbnailFile] = useState(''); // URL cho thumbnail
   const [imagesUrl, setImagesUrl] = useState([]); // Mảng URL cho images
   const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -82,6 +82,8 @@ function CreateRoom() {
       try {
         const response = await getHotels();
         const hotelList = Array.isArray(response.hotelList) ? response.hotelList : response.hotelList.data || [];
+        console.log(hotelList);
+        
         setHotels(hotelList.map((item) => ({ id: item.id, name: item.name })));
       } catch (error) {
         console.error('Lỗi khi tải danh sách khách sạn:', error);
@@ -113,12 +115,12 @@ function CreateRoom() {
 
     // Thumbnail
     if (selectedFiles.length > 0) {
-      formData.append("thumbnail", thumbnailUrl); // ảnh đại diện
+      formData.append("thumbnail", thumbnailFile); // ảnh đại diện
     }
 
     // Images (danh sách ảnh)
     selectedFiles.forEach((file) => {
-      formData.append("images", file); // backend phải có List<MultipartFile> images
+      formData.append("imageFiles", file); // backend phải có List<MultipartFile> images
     });
 
     try {
@@ -211,13 +213,8 @@ function CreateRoom() {
 
   const handleThumbnailUpload = ({ file }) => {
     console.log('Thumbnail upload:', file);
-    if (file.status === 'done') {
-      const url = file.response;
-      setThumbnailUrl(url);
-      message.success(`${file.name} tải lên thành công!`);
-    } else if (file.status === 'error') {
-      message.error(`${file.name} tải lên thất bại: ${file.error?.message || 'Lỗi không xác định'}`);
-    }
+      const thumbnailFile = file.originFileObj;
+      setThumbnailFile(thumbnailFile);
   };
 
   const handleImagesUpload = ({ file, fileList }) => {
@@ -260,11 +257,7 @@ function CreateRoom() {
                   >
                     <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
                   </Upload>
-                  {thumbnailUrl && (
-                    <div style={{ marginTop: 20 }}>
-                      <img src={thumbnailUrl} alt="Thumbnail preview" style={{ maxWidth: '200px' }} />
-                    </div>
-                  )}
+                  
                 </Form.Item>
               </Col>
               <Col span={24}>

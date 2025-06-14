@@ -29,15 +29,6 @@ function Detail() {
         'Giặt ủi',
         'Spa & massage',
         'Phòng gym',
-        'Hồ bơi ngoài trời',
-        'Cho thuê xe máy / ô tô',
-        'Dịch vụ giữ hành lý',
-        'Quầy tour du lịch',
-        'Bữa sáng tại phòng',
-        'Trợ giúp đặc biệt (concierge)',
-        'Dịch vụ trông trẻ',
-        'Wi-Fi miễn phí toàn khách sạn',
-        'Dọn phòng hàng ngày',
     ];
 
     useEffect(() => {
@@ -167,7 +158,7 @@ function Detail() {
                     <Row gutter={[20, 20]}>
                         <Col xxl={18} xl={18} lg={18} md={24} sm={24} span={24}>
                             <div className="slide">
-                                <ImageSlider images={data.images} />
+                                <ImageSlider images={data.images.map((item)=> (item.imageUrl))} />
                             </div>
                         </Col>
                         <Col xxl={6} xl={6} lg={6} md={24} sm={24} span={24}>

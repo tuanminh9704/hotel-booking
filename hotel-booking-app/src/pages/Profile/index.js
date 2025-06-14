@@ -13,21 +13,21 @@ import { getUserById } from "../../Service/UserServices";
 const { Title, Text } = Typography;
 
 export default function Profile() {
-    const fullName = localStorage.getItem("fullName") || "Chưa có tên";
-    const email = localStorage.getItem("email") || "Chưa có email";
-    const phone = localStorage.getItem("phone") || "Chưa có số điện thoại";
-    const userId = localStorage.getItem("userId")?.trim();
-
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
+                const userId = localStorage.getItem("userId")?.trim();
+                if (!userId) return;
+
                 const res = await getUserById(userId);
                 const userData = res.user;
+                console.log(userData);
+                
 
-                const enrichedBookings = (userData.bookings || []).map(b => ({
+                const enrichedBookings = (userData.bookings || []).map((b) => ({
                     ...b,
                     key: b.id,
                 }));
@@ -36,15 +36,18 @@ export default function Profile() {
                     ...userData,
                     bookings: enrichedBookings,
                 });
+
+                // Lưu thông tin vào localStorage để đồng bộ
+                localStorage.setItem("fullName", userData.name || "Chưa có tên");
+                localStorage.setItem("email", userData.email || "Chưa có email");
+                localStorage.setItem("phone", userData.phoneNumber || "Chưa có số điện thoại");
             } catch (error) {
                 console.error("Lỗi khi tải dữ liệu người dùng:", error);
             }
         };
 
-        if (userId) {
-            fetchUser();
-        }
-    }, [userId]);
+        fetchUser();
+    }, []);
 
     const columns = [
         {
@@ -73,7 +76,7 @@ export default function Profile() {
 
                 if (lower === "confirmed") color = "green";
                 else if (lower === "pending") color = "orange";
-                else if (lower === "canceled") color = "red";
+                else if (lower === "canceled" || lower === "cancelled") color = "red"; // Xử lý cả "cancelled"
 
                 return <Tag color={color}>{status}</Tag>;
             },
@@ -97,13 +100,13 @@ export default function Profile() {
                 <div className="profile-horizontal">
                     <Avatar size={100} icon={<UserOutlined />} />
                     <div className="profile-info">
-                        <Title level={3}>{fullName}</Title>
+                        <Title level={3}>{user?.name || localStorage.getItem("fullName") || "Chưa có tên"}</Title>
                         <Space direction="vertical" size="small">
                             <Text>
-                                <MailOutlined /> {email}
+                                <MailOutlined /> {user?.email || localStorage.getItem("email") || "Chưa có email"}
                             </Text>
                             <Text>
-                                <PhoneOutlined /> {phone}
+                                <PhoneOutlined /> {user?.phoneNumber || localStorage.getItem("phone") || "Chưa có số điện thoại"}
                             </Text>
                         </Space>
                     </div>

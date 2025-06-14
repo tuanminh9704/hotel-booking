@@ -58,7 +58,7 @@ function Payment() {
             const response = await bookRoom(roomTypeId, userId, payload); // ✅ Sửa: await
 
             if (response.statusCode === 200) {
-                navigate('code', { state: { bookingData, guestInfo: values } });// ✅ Điều hướng sau khi thành công
+                navigate('/', { state: { bookingData, guestInfo: values } });// ✅ Điều hướng sau khi thành công
             } else {
                 throw new Error(response.message || 'Đặt phòng thất bại.');
             }

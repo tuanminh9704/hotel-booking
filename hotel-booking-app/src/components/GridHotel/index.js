@@ -52,7 +52,7 @@ function GridHotel(props) {
                 <Row gutter={[20, 20]}>
                   <Col span={24}>
                     <div className="image">
-                      <img src={item.thumbnail} alt="ảnh khách sạn" />
+                      <img src={item?.images[0]?.imageUrl || ""} alt="ảnh khách sạn" />
                     </div>
                   </Col>
                   <Col span={24}>
