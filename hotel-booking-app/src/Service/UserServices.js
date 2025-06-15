@@ -1,4 +1,4 @@
-import { post, get, del, patch } from "../utils/request"
+import { post, get, del, patch, put } from "../utils/request"
 
 
 export const createUser = async (options) => {
@@ -23,4 +23,9 @@ export const getUserById = async (id) => {
 
 export const editRoom = async (id, options) => {
     return await patch(`rooms/${id}`,options);
+}
+
+
+export const updateRole = async (id, options) => {
+    return await put(`users/update/${id}`,options);
 }

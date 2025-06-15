@@ -36,7 +36,7 @@ public class UserService implements IUserService {
         Response response = new Response();
         try {
             if (user.getRole() == null || user.getRole().isBlank()) {
-                user.setRole("USER");
+                user.setRole("customer");
             }
             if (userRepository.existsByEmail(user.getEmail())) {
                 throw new OurException(user.getEmail() + "Already Exists");
@@ -180,6 +180,27 @@ public class UserService implements IUserService {
         }
         return response;
     }
+
+    @Override
+    public Response updateUserById(UUID userId, UserDTO dto) {
+        Response response = new Response();
+        try {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new OurException("User Not Found"));
+
+            user.setRole(dto.getRole()); 
+            User updatedUser = userRepository.save(user); 
+
+            response.setStatusCode(200);
+            response.setMessage("User role updated successfully");
+
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setMessage("Update failed: " + e.getMessage());
+        }
+        return response;
+    }
+
 
     @Override
     public Response getMyInfo(String email) {

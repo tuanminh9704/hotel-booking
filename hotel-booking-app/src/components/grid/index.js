@@ -77,6 +77,8 @@ function Grid() {
         setLoading(true);
         const  bookings  = await getBookings()
         setData( bookings );
+        console.log(bookings);
+        
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error.message);
       } finally {

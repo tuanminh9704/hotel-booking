@@ -55,7 +55,7 @@ function Login() {
 
                
 
-                if(response.role === "ADMIN"){
+                if(response.role === "ADMIN" || response.role === "manager"){
                     message.success("Đăng nhập thành công");
                     navigate("/admin");
                 }else {

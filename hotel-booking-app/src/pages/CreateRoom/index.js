@@ -33,7 +33,7 @@ function CreateRoom() {
     });
   };
 
-  console.log(selectedFiles);
+
 
 
   const availableAmenities = [
@@ -82,7 +82,6 @@ function CreateRoom() {
       try {
         const response = await getHotels();
         const hotelList = Array.isArray(response.hotelList) ? response.hotelList : response.hotelList.data || [];
-        console.log(hotelList);
         
         setHotels(hotelList.map((item) => ({ id: item.id, name: item.name })));
       } catch (error) {
@@ -166,7 +165,6 @@ function CreateRoom() {
 
     try {
       const response = await createRoom(roomData);
-      console.log(response);
 
       if (response.statusCode === 201) {
         message.success('Thêm phòng thành công');
@@ -218,7 +216,7 @@ function CreateRoom() {
   };
 
   const handleImagesUpload = ({ file, fileList }) => {
-    console.log({ file });
+
     if (file.status === 'done') {
       const url = file.response[0];
       setImagesUrl((prev) => [...prev, url]);

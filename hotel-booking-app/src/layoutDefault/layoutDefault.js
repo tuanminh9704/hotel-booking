@@ -13,7 +13,7 @@ function LayoutDefault() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (role !== "ADMIN") {
+    if (role !== "ADMIN" && role !== "manager") {
       alert("Bạn không có quyền truy cập");
       navigate("/");
     }
@@ -38,43 +38,44 @@ function LayoutDefault() {
     },
     {
       label: <Link to="acc">Quản lý tài khoản</Link>,
-      icon:<UserOutlined />,
-      key:"account"
+      icon: <UserOutlined />,
+      key: "account",
+      disabled: role !== "ADMIN"  
     }
   ]
 
-  return (
-    <>
-      <Layout className='layout-default'>
-        <header className='layout-default__header'>
-          <div className="header">
-            <div className={"header__logo " + (collapsed && 'header__logo--fold')} >
-              <img src={collapsed ? (logoFold) : (logo)} alt='logo'></img>
+return (
+  <>
+    <Layout className='layout-default'>
+      <header className='layout-default__header'>
+        <div className="header">
+          <div className={"header__logo " + (collapsed && 'header__logo--fold')} >
+            <img src={collapsed ? (logoFold) : (logo)} alt='logo'></img>
+          </div>
+          <div className='header__body'>
+            <div className='header__body-left'>
+              <div className='menu' onClick={() => { setCollapsed(!collapsed) }}>{collapsed ? (<MenuUnfoldOutlined />) : (<MenuFoldOutlined />)}</div>
+              <div className='search'><SearchOutlined /></div>
             </div>
-            <div className='header__body'>
-              <div className='header__body-left'>
-                <div className='menu' onClick={() => { setCollapsed(!collapsed) }}>{collapsed ? (<MenuUnfoldOutlined />) : (<MenuFoldOutlined />)}</div>
-                <div className='search'><SearchOutlined /></div>
-              </div>
-              <div className='header__body-right'>
-                <Notification />
-              </div>
+            <div className='header__body-right'>
+              <Notification />
             </div>
           </div>
-        </header>
-        <Layout>
-          <Sider className='layout-default__sider'
-            theme='light' collapsed={collapsed}
-            width={250}>
-            <Menu items={items} mode='inline' defaultOpenKeys={['menu-1']} defaultSelectedKeys={['menu-1']}></Menu>
-          </Sider>
-          <Content className={'layout-default__content ' + (collapsed && 'layout-default__content--collapsed')}>
-            <Outlet />
-          </Content>
-        </Layout>
+        </div>
+      </header>
+      <Layout>
+        <Sider className='layout-default__sider'
+          theme='light' collapsed={collapsed}
+          width={250}>
+          <Menu items={items} mode='inline' defaultOpenKeys={['menu-1']} defaultSelectedKeys={['menu-1']}></Menu>
+        </Sider>
+        <Content className={'layout-default__content ' + (collapsed && 'layout-default__content--collapsed')}>
+          <Outlet />
+        </Content>
       </Layout>
-    </>
-  )
+    </Layout>
+  </>
+)
 }
 
 export default LayoutDefault;
